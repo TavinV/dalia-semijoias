@@ -1,0 +1,19 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=Ibarra+Real+Nova:ital,wght@0,400..700;1,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@theme {
+    --color-secondary: #EDE9E3;
+    --color-primary: #BE8F6E;
+    --color-accent: #DC143C;
+    --color-text: #323232;
+
+    --font-title: "Ibarra Real Nova", serif;
+    --font-highlight: "DM Serif Text", serif;
+    --font-default: "Inter", sans-serif;
+}
+
+body {
+    @apply font-default text-[var(--color-text)];
+    /* aplicando a cor secundaria como background do corpo */
+    background-color: var(--color-secondary);
+}
