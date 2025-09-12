@@ -1,9 +1,11 @@
 // ShoppingCart.jsx
-import React from "react";
+import Button from "./Button";
+import { BsGift } from 'react-icons/bs';
+import { useCart } from "../../hooks/useCart.jsx";
 
 const CartHeader = () => {
   return (
-    <div className="hidden md:grid md:grid-cols-[1fr_minmax(100px,auto)_minmax(120px,auto)] items-center gap-x-8 py-3 border-b border-gray-300 font-semibold text-gray-700">
+    <div className="hidden md:grid md:grid-cols-[1fr_minmax(100px,auto)_minmax(120px,auto)] items-center gap-x-8 py-6 font-semibold text-gray-700">
       <div>Produto</div>
       <div className="text-center">Quantidade</div>
       <div className="text-right">Subtotal</div>
@@ -13,97 +15,142 @@ const CartHeader = () => {
 
 
 const CartItem = ({ product }) => {
+  const { addItem, deductItem } = useCart();
+
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[1fr_minmax(100px,auto)_minmax(120px,auto)] items-center gap-x-8 gap-y-4 py-4 border-b border-gray-300">
+    <article className="grid grid-cols-1 md:grid-cols-[1fr_minmax(100px,auto)_minmax(120px,auto)] items-start gap-x-8 gap-y-4">
+      
       {/* Coluna 1 - Imagem + Nome + Material */}
       <div className="flex gap-3 items-start">
         <img
           src={product.image}
-          alt={product.name}
-          className="w-16 h-16 object-cover rounded-md flex-shrink-0"
+          alt={`Imagem de ${product.name}`}
+          className="w-32 h-32 object-cover flex-shrink-0"
         />
         <div>
           <div className="md:hidden text-xs text-gray-500 mb-1">Produto</div>
-          <p className="font-medium">{product.name}</p>
-          <p className="text-sm text-gray-600">{product.material}</p>
-          <button className="text-xs text-blue-600 underline mt-1">Alterar</button>
+          <p className="font-title uppercase font-semibold">{product.name}</p>
+          <div className="flex items-center gap-4 mt-2">
+            <p className="text-sm font-title uppercase font-semibold">
+              {product.material}
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Coluna 2 - Quantidade */}
-      <div>
-        <div className="md:hidden text-xs text-gray-500 mb-1">Quantidade</div>
+      {/* Colunas 2 e 3 agrupadas em telas pequenas */}
+      <div className="md:hidden flex justify-between gap-4">
+        {/* Quantidade */}
+        <div className="flex-1">
+          <div className="text-xs text-gray-500 mb-1">Quantidade</div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => deductItem(product)}
+              className="px-2 h-8 text-xl"
+            >
+              -
+            </button>
+            <span className="w-8 h-8 flex items-center justify-center rounded border border-gray-300">
+              {product.qty}
+            </span>
+            <button
+              type="button"
+              onClick={() => addItem(product)}
+              className="px-2 h-8 text-xl"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        {/* Subtotal */}
+        <div className="flex-1 text-right">
+          <div className="text-xs text-gray-500 mb-1">Subtotal</div>
+          <div className="font-semibold">R$ {product.subtotal.toFixed(2)}</div>
+        </div>
+      </div>
+
+      {/* Em telas md+ mantemos os itens separados */}
+      <div className="hidden md:block">
         <div className="flex items-center gap-2">
-          <button className="px-2 h-8 border rounded text-sm">-</button>
-          <span className="w-8 text-center">{product.qty}</span>
-          <button className="px-2 h-8 border rounded text-sm">+</button>
+          <button
+            type="button"
+            onClick={() => deductItem(product)}
+            className="px-2 h-8 text-xl"
+          >
+            -
+          </button>
+          <span className="w-8 h-8 flex items-center justify-center rounded border border-gray-300">
+            {product.qty}
+          </span>
+          <button
+            type="button"
+            onClick={() => addItem(product)}
+            className="px-2 h-8 text-xl"
+          >
+            +
+          </button>
         </div>
       </div>
 
-      {/* Coluna 3 - Subtotal */}
-      <div className="text-right">
-        <div className="md:hidden text-xs text-gray-500 mb-1">Subtotal</div>
-        <div className="font-medium">R$ {product.subtotal.toFixed(2)}</div>
+      <div className="hidden md:block text-right font-semibold">
+        R$ {product.subtotal.toFixed(2)}
       </div>
-    </div>
+    </article>
   );
 };
 
-
-const ShoppingCart = ({ onClose }) => {
-  // mock data
-  const cart = [
-    {
-      name: "Anel Insp Chanel",
-      material: "Ouro 18K",
-      qty: 1,
-      subtotal: 42,
-      image: "https://source.unsplash.com/160x160/?ring,jewelry",
-    },
-    {
-      name: "Anel 9 Linhas",
-      material: "Ouro 18K",
-      qty: 3,
-      subtotal: 114,
-      image: "https://source.unsplash.com/160x160/?gold,ring",
-    },
-    {
-      name: "Corrente Elo Cartier",
-      material: "Ouro 18K",
-      qty: 1,
-      subtotal: 42,
-      image: "https://source.unsplash.com/160x160/?necklace,gold",
-    },
-  ];
+const ShoppingCart = () => {
+  const {cart, total} = useCart();
 
   return (
-    <div className="fixed top-20 right-0 w-full md:max-w-2xl bg-[#F3F3F3] shadow-lg z-50 p-4">
+    <aside className="fixed top-20 right-0 w-full md:max-w-2xl bg-[#F3F3F3] shadow-lg z-50 p-4">
       {/* Header */}
-      <div className="flex items-center justify-between border-b-2 border-gray-300 pb-2">
+      <header className="flex items-center justify-between border-b-2 border-gray-300 pb-2">
         <h2 className="text-xl font-bold">Carrinho</h2>
-        <h2 className="text-xl font-bold">{cart.length} itens</h2>
-      </div>
+        <h2 className="text-xl font-bold">{cart.length} item{cart.length > 1 ? 's' : ''}</h2>
+      </header>
 
-      {/* Labels da "tabela" (aparecem em md+) */}
-      <CartHeader />
+      {/* Cabeçalho das colunas (somente md+) */}
 
-      {/* Lista de itens */}
-      <div>
-        {cart.map((item, i) => (
-          <CartItem key={i} product={item} />
-        ))}
-      </div>
+      {/* Itens */}
+      {
+        cart.length === 0 ? 
+        <h1 className="mt-8 font-title text-xl">Ainda não há itens no carrinho.</h1> :  
+        <>
+          <CartHeader />
+          <section className="flex flex-col gap-6 mt-4">
+            {cart.map((item) => (
+              <CartItem key={item.id} product={item} />
+            ))}
+          </section>
+        </>
+      }
 
       {/* Rodapé */}
-      <div className="flex flex-col sm:flex-row justify-between items-center border-t border-gray-300 pt-3 mt-3 gap-3">
-        <button className="px-4 py-2 border border-gray-700 rounded-md">
-          Finalizar pedido
-        </button>
-        <p className="font-bold">
-          Total: R$ {cart.reduce((acc, item) => acc + item.subtotal, 0).toFixed(2)}
-        </p>
-      </div>
-    </div>
+      {
+        cart.length === 0 ? <></>: 
+        <footer className="flex justify-between items-center border-t border-gray-300 pt-3 mt-4 gap-3">
+          <div className="flex items-stretch gap-4">
+            <Button text="Finalizar pedido" onClick={() => alert("Pedido finalizado!")} />
+            
+            <Button text={<BsGift size={24} color="var(--color-dark-accent)" />}></Button>
+          </div>
+
+          <div className="text-right flex flex-col">
+            <p className="">
+              Total
+            </p>
+            <p className="text-lg">
+              R$ {total}
+            </p>
+          </div>
+        </footer>
+
+      }
+
+    </aside>
   );
 };
 
