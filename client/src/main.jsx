@@ -4,13 +4,19 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { CartProvider } from './context/CartContext.jsx';
 
 import './index.css'
-import App from './App.jsx'
+
+import ErrorPage from './pages/ErrorPage.jsx';
+import Catalog from './pages/Catalog.jsx'
 
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <App />,
+    element: <Catalog />,
   },
+  {
+    path: '/error',
+    element: <ErrorPage />
+  }
 ]);
 
 createRoot(document.getElementById('root')).render(

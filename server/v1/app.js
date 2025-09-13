@@ -1,11 +1,12 @@
 import express from 'express';
 import path from 'path';
-import fs from 'fs';
+import cors from 'cors'
 import { configDotenv } from 'dotenv';
 
 const app = express();
 
 configDotenv();
+app.use(cors());
 app.use(express.json());
 
 // Importação das rotas

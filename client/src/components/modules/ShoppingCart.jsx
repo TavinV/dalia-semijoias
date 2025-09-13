@@ -1,5 +1,5 @@
 // ShoppingCart.jsx
-import Button from "./Button";
+import Button from "../ui/Button.jsx";
 import { BsGift } from 'react-icons/bs';
 import { useCart } from "../../hooks/useCart.jsx";
 
@@ -72,7 +72,7 @@ const CartItem = ({ product }) => {
       </div>
 
       {/* Em telas md+ mantemos os itens separados */}
-      <div className="hidden md:block">
+      <div className="hidden md:flex justify-center">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -105,7 +105,7 @@ const ShoppingCart = () => {
   const {cart, total} = useCart();
 
   return (
-    <aside className="fixed top-20 right-0 w-full md:max-w-2xl bg-[#F3F3F3] shadow-lg z-50 p-4">
+    <aside className="absolute top-20 right-0 w-full md:max-w-2xl bg-[#F3F3F3] shadow-lg z-50 p-4">
       {/* Header */}
       <header className="flex items-center justify-between border-b-2 border-gray-300 pb-2">
         <h2 className="text-xl font-bold">Carrinho</h2>
@@ -120,7 +120,7 @@ const ShoppingCart = () => {
         <h1 className="mt-8 font-title text-xl">Ainda não há itens no carrinho.</h1> :  
         <>
           <CartHeader />
-          <section className="flex flex-col gap-6 mt-4">
+          <section className="flex flex-col gap-6 mt-4 overflow-auto max-h-80">
             {cart.map((item) => (
               <CartItem key={item.id} product={item} />
             ))}

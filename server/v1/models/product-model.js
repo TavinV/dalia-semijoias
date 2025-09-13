@@ -9,6 +9,7 @@ const productSchema = new mongoose.Schema({
     category: { type: String, required: true },
     stock: { type: Number, required: true },
     material: { type: String, required: true },
+    gender: {type: String, default: "feminino"}
 }, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);

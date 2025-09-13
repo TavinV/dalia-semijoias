@@ -17,16 +17,26 @@ export function CartProvider({ children }) {
   const addItem = (item) => {
     setCart((prev) => {
       const exists = prev.find((p) => p.id === item.id);
+
       if (exists) {
-        return prev.map((p) =>
-          p.id === item.id
-            ? { ...p, qty: p.qty + 1, subtotal: (p.qty + 1) * item.price }
-            : p
-        );
+        // Verifica se já atingiu o estoque máximo
+        if (exists.qty < item.stock) {
+          return prev.map((p) =>
+            p.id === item.id
+              ? { ...p, qty: p.qty + 1, subtotal: (p.qty + 1) * p.price }
+              : p
+          );
+        } else {
+          // Já atingiu estoque, não adiciona mais
+          return prev;
+        }
       }
+
+      // Se não existe no carrinho, adiciona o item com qty = 1
       return [...prev, { ...item, qty: 1, subtotal: item.price }];
     });
   };
+
 
   const deductItem = (item) => {
     setCart((prev) => {

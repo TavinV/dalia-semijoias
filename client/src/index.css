@@ -17,4 +17,16 @@ body {
     @apply font-default text-[var(--color-text)];
     /* aplicando a cor secundaria como background do corpo */
     background-color: var(--color-secondary);
+    overflow-x: hidden;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE e Edge */
+    scrollbar-width: none;
+    /* Firefox */
 }
