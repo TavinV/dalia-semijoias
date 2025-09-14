@@ -29,7 +29,7 @@ const Footer = () => {
                     <h1 className="font-title font-semibold uppercase text-lg md:text-xl">Coleção</h1>
                     <ul className="list-none flex flex-col gap-1">
                         {
-                            colection.map(c => (<li className="hover:scale-105 transition-all ease-in">{c}</li>))
+                            colection.map(c => (<li key={c} className="hover:scale-105 transition-all ease-in">{c}</li>))
                         }
                     </ul>
                 </div>

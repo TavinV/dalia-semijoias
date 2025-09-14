@@ -1,24 +1,31 @@
 function generateWhatsAppLink(products) {
-    const phone = "5511950231230";
+    const phone = "5511947034640";
 
-    let message = "🌸 *Dália Semijoias* 🌸%0A";
-    message += "Olá, gostaria de fazer um pedido:%0A%0A";
+    // Monta a mensagem com quebras de linha reais (\n) — NÃO usar "%0A" manualmente
+    let message = "✨ *Dália Semijoias* ✨\n";
+    message += "Olá, gostaria de fazer um pedido:\n\n";
 
     let total = 0;
 
     products.forEach((p, i) => {
-        message += `💎 *Item ${i + 1}*%0A`;
-        message += `🆔 ID: ${p.id}%0A`;
-        message += `📦 Nome: ${p.name}%0A`;
-        message += `🔢 Quantidade: ${p.qty}%0A`;
-        message += `💰 Subtotal: R$ ${p.subtotal.toFixed(2)}%0A%0A`;
-        total += p.subtotal;
+        const subtotal = Number(p.subtotal) || 0;
+        const qty = Number(p.qty) || 0;
+
+        message += `✨ *Item ${i + 1}*\n`;
+        message += `🆔 ID: ${p.id}\n`;
+        message += `📦 Nome: ${p.name}\n`;
+        message += `🔢 Quantidade: ${qty}\n`;
+        message += `💰 Subtotal: R$ ${subtotal.toFixed(2)}\n\n`;
+
+        total += subtotal;
     });
 
-    message += `✨ *Total do Pedido: R$ ${total.toFixed(2)}* ✨%0A%0A`;
-    message += "Obrigado por comprar com a *Dália Semijoias* 🌸💖";
+    message += `✨ *Total do Pedido: R$ ${total.toFixed(2)}* ✨\n\n`;
+    message += "Obrigado por comprar com a *Dália Semijoias* ✨💖";
 
-    return `https://wa.me/${phone}?text=${message}`;
+    // Só aqui codificamos a mensagem para a URL
+    const encoded = encodeURIComponent(message);
+    return `https://wa.me/${phone}?text=${encoded}`;
 }
 
 export default generateWhatsAppLink;

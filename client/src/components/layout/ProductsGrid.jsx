@@ -11,6 +11,7 @@ const ProductsGrid = ({ products, title }) => {
                     {products.map((product) =>
                         product.stock >= 1 ? (
                             <ProductCard
+                                id={product.dalia_id}
                                 key={product._id}
                                 product={product}
                             />

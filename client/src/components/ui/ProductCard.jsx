@@ -38,7 +38,7 @@ const MaterialBadge = ({ material }) => {
     return null;
 };
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({id, product }) => {
     const { addItem } = useCart();
 
     const handleAddToCart = () => {
@@ -54,7 +54,7 @@ const ProductCard = ({ product }) => {
     };
 
     return (
-        <div className="flex flex-col overflow-hidden shadow-xl w-full font-title">
+        <div id={id} className="flex flex-col overflow-hidden shadow-xl w-full font-title">
             {/* Imagem (cobre a parte superior, sem padding) */}
             <div className="aspect-square w-full relative">
                 <img
