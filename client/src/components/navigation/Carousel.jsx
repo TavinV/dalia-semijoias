@@ -70,7 +70,14 @@ const Carousel = () => {
                             image={item.image}
                             title={item.title}
                             description={item.description}
-                            onClick={() => {alert(item.title)}}
+                            onClick={() => {
+                                const targetId = item.title.toLowerCase().replace(/\s+/g, "-");
+                                const el = document.getElementById(targetId);
+                                if (el) {
+                                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                                }
+                            }
+                            }
                         />
                     </div>
                 ))}

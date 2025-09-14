@@ -60,6 +60,9 @@ const updateProductSchema = Joi.object({
     imageUrl: Joi.string().messages({
         "string.base": "A URL da imagem deve ser um texto válido",
     }),
+
+    gender: Joi.string(),
+    image: Joi.string()
 })
     .min(1)
     .messages({

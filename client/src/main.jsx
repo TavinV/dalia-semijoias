@@ -7,6 +7,9 @@ import './index.css'
 
 import ErrorPage from './pages/ErrorPage.jsx';
 import Catalog from './pages/Catalog.jsx'
+import LoginPage from './pages/LoginPage.jsx';
+import Dashboard from './pages/Dashboard.jsx';
+import CreateProductPage from './pages/CreateProduct.jsx';
 
 const router = createBrowserRouter([
   {
@@ -16,6 +19,18 @@ const router = createBrowserRouter([
   {
     path: '/error',
     element: <ErrorPage />
+  },
+  {
+    path: '/login',
+    element: <LoginPage />
+  },
+  {
+    path: '/dashboard',
+    element: <Dashboard />
+  },
+  {
+    path: '/create-product',
+    element: <CreateProductPage />
   }
 ]);
 

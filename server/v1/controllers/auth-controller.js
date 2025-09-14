@@ -7,10 +7,13 @@ const authController = {
 
         if (username === process.env.ADMINLOGIN && password === process.env.ADMINPASSWORD) {
             const token = JwtServices.createToken({ username });
-            return ApiResponse.OK(res, { token }, 'Login successful');
+            return ApiResponse.OK(res, { token }, 'Login feito com sucesso');
         }
 
-        return ApiResponse.UNAUTHORIZED(res, 'Invalid credentials');
+        return ApiResponse.UNAUTHORIZED(res, 'Login e(ou) senha incorreto(s)!');
+    },
+    async validateSession(req, res) {
+        return ApiResponse.OK(res)
     }
 };
 

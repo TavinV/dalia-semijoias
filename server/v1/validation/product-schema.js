@@ -76,7 +76,8 @@ const productSchema = Joi.object({
             "string.empty": "O material é obrigatório",
             "string.min": "O material deve ter pelo menos {#limit} caracteres",
             "string.max": "O material não pode passar de {#limit} caracteres"
-        })
+        }),
+    gender: Joi.string()
 });
 
 export default productSchema;

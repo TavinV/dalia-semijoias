@@ -1,9 +1,9 @@
 import { NavLink } from "react-router-dom"
 
-const Logo = () => {
+const Logo = ( {height = 12}) => {
   return (
     <NavLink to="/">
-      <img className="h-12" src="/logo.png" alt="Logo" />
+      <img className={`h-${height}`} src="/logo.png" alt="Logo" />
     </NavLink>
   )
 }

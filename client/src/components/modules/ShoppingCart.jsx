@@ -1,6 +1,6 @@
 // ShoppingCart.jsx
 import Button from "../ui/Button.jsx";
-import { BsGift } from 'react-icons/bs';
+import generateWhatsAppLink from "../../utils/generateWhatsappLink.js";
 import { useCart } from "../../hooks/useCart.jsx";
 
 const CartHeader = () => {
@@ -105,7 +105,7 @@ const ShoppingCart = () => {
   const {cart, total} = useCart();
 
   return (
-    <aside className="absolute top-20 right-0 w-full md:max-w-2xl bg-[#F3F3F3] shadow-lg z-50 p-4">
+    <aside className="fixed top-20 right-0 w-full md:max-w-2xl bg-[#F3F3F3] shadow-lg z-50 p-4">
       {/* Header */}
       <header className="flex items-center justify-between border-b-2 border-gray-300 pb-2">
         <h2 className="text-xl font-bold">Carrinho</h2>
@@ -133,9 +133,8 @@ const ShoppingCart = () => {
         cart.length === 0 ? <></>: 
         <footer className="flex justify-between items-center border-t border-gray-300 pt-3 mt-4 gap-3">
           <div className="flex items-stretch gap-4">
-            <Button text="Finalizar pedido" onClick={() => alert("Pedido finalizado!")} />
-            
-            <Button text={<BsGift size={24} color="var(--color-dark-accent)" />}></Button>
+              <Button text="Finalizar pedido" onClick={() => window.location.href = generateWhatsAppLink(cart)} />
+
           </div>
 
           <div className="text-right flex flex-col">

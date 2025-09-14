@@ -85,7 +85,7 @@ const ProductCard = ({ product }) => {
                             </span>
                         </p>
 
-                        <div className="text-sm md:text-base flex flex-col items-start md:items-end">
+                        <div className="text-sm md:text-base flex flex-col items-start md:items-end gap-2">
                             <span>Banhado a</span>
                             <MaterialBadge material={product.material} />
                         </div>
