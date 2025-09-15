@@ -77,7 +77,7 @@ const ProductsTable = () => {
                         <tr key={product.id} className="even:bg-[#F3F3F3] hover:bg-primary/10">
                             <td className="p-2 md:p-4">
                                 <img
-                                    src={`http://localhost:3000/uploads/${product.imageUrl}`}
+                                    src={`https://dalia-semijoias-api.onrender.com/uploads/${product.imageUrl}`}
                                     alt={product.name}
                                     className="w-24 h-24 object-cover"
                                 />
