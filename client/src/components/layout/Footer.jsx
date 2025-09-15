@@ -45,7 +45,7 @@ const Footer = () => {
                     </ul>
                 </div>
             </footer>
-            <div className="w-full h-10 flex items-center justify-center font-light text-center bg-[#E7D7C9]">
+            <div className="w-full h-10 p-2 flex items-center justify-center font-light text-center bg-[#E7D7C9]">
                 <NavLink to="/dashboard">
                     © 2025 Dália Concept todos os direitos reservados
                 </NavLink>
