@@ -57,7 +57,7 @@ const LoginPage = () => {
             <Header />
             <main className="min-h-screen flex items-center justify-center text-dark">
 
-                <div className="flex w-[900px] h-[500px] shadow-2xl bg-dark-accent overflow-hidden md:flex-row flex-col">
+                <div className="flex flex-col md:flex-row w-full max-w-[900px] md:h-[500px] min-h-screen shadow-2xl bg-dark-accent overflow-auto">
                     {/* Painel da marca */}
                     <div className="bg-dark w-full md:w-1/2 flex flex-col items-center justify-center p-10 text-center">
                         <Logo className="text-light text-4xl mb-6" />
