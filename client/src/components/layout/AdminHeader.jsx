@@ -11,16 +11,22 @@ const AdminHeader = () => {
         navigate("/login");
     };
 
+    const handleLogoutLink = (e) => {
+        e.preventDefault();
+        setMenuOpen(false);
+        handleLogout();
+    };
+
     return (
         <header className="w-full sticky top-0 z-50 bg-secondary shadow-2xl">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-4 py-5 flex items-center justify-between">
                 <Logo />
 
-                {/* Desktop Menu */}
-                <nav className="hidden md:flex items-center space-x-6 font-title">
+                {/* Menu Desktop */}
+                <nav className="hidden md:flex items-center space-x-6">
                     <NavLink
                         to="/"
-                        className="text-white hover:text-primary transition"
+                        className="text-black hover:text-primary transition"
                     >
                         Estoque
                     </NavLink>
@@ -30,19 +36,20 @@ const AdminHeader = () => {
                     >
                         Cadastrar Produto
                     </NavLink>
-                    <button
-                        onClick={handleLogout}
-                        className="text-black hover:text-red-400 transition"
+                    <NavLink
+                        to="/login"
+                        onClick={handleLogoutLink}
+                        className="text-black hover:text-red-500 transition"
                     >
                         Sair
-                    </button>
+                    </NavLink>
                 </nav>
 
-                {/* Mobile Menu Toggle */}
+                {/* Botão Hamburguer Mobile */}
                 <div className="md:hidden">
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
-                        className="text-white focus:outline-none"
+                        className="text-black focus:outline-none"
                     >
                         <svg
                             className="h-6 w-6"
@@ -71,32 +78,30 @@ const AdminHeader = () => {
                 </div>
             </div>
 
-            {/* Mobile Menu */}
+            {/* Menu Mobile */}
             {menuOpen && (
-                <div className="md:hidden px-4 pb-4 font-title">
+                <div className="md:hidden px-4 pb-4 space-y-2">
                     <NavLink
                         to="/"
-                        className="block py-2 text-white hover:text-black transition"
+                        className="block text-black hover:text-primary transition"
                         onClick={() => setMenuOpen(false)}
                     >
                         Estoque
                     </NavLink>
                     <NavLink
                         to="/create-product"
-                        className="block py-2 text-white hover:text-black transition"
+                        className="block text-black hover:text-primary transition"
                         onClick={() => setMenuOpen(false)}
                     >
                         Cadastrar Produto
                     </NavLink>
-                    <button
-                        onClick={() => {
-                            setMenuOpen(false);
-                            handleLogout();
-                        }}
-                        className="block py-2 text-white hover:text-red-400 transition"
+                    <NavLink
+                        to="/login"
+                        onClick={handleLogoutLink}
+                        className="block text-black hover:text-red-500 transition"
                     >
                         Sair
-                    </button>
+                    </NavLink>
                 </div>
             )}
         </header>
