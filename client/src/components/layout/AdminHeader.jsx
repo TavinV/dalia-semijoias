@@ -25,7 +25,7 @@ const AdminHeader = () => {
                 {/* Menu Desktop */}
                 <nav className="hidden md:flex items-center space-x-6">
                     <NavLink
-                        to="/"
+                        to="/dashboard"
                         className="text-black hover:text-primary transition"
                     >
                         Estoque
@@ -82,7 +82,7 @@ const AdminHeader = () => {
             {menuOpen && (
                 <div className="md:hidden px-4 pb-4 space-y-2">
                     <NavLink
-                        to="/"
+                        to="/dashboard"
                         className="block text-black hover:text-primary transition"
                         onClick={() => setMenuOpen(false)}
                     >
