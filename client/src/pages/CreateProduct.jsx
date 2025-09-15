@@ -1,4 +1,5 @@
 import Logo from "../components/ui/Logo";
+import AdminHeader from "../components/layout/AdminHeader";
 
 import { NavLink } from "react-router-dom";
 
@@ -8,15 +9,6 @@ import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 import CreateProductForm from "../components/modules/CreateProductForm";
-
-const Header = () => {
-    return (
-        <header className="w-screen sticky top-0 h-20 py-5 px-15 flex items-center justify-between bg-secondary shadow-2xl z-50">
-            <Logo />
-            <NavLink to="/dashboard" className="bg-primary text-dark py-3 font-medium mt-2 hover:bg-dark-accent hover:text-secondary transition ease-in p-4 font-title text-white">Estoque</NavLink>
-        </header>
-    );
-};
 
 const CreateProductPage = () => {
     const navigate = useNavigate();
@@ -31,7 +23,7 @@ const CreateProductPage = () => {
 
     return (
         <>
-            <Header />
+            <AdminHeader />
             <main className="p-5 mt-12 flex justify-center items-center">
                 <CreateProductForm></CreateProductForm>
             </main>
