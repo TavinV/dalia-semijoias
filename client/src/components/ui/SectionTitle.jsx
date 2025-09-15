@@ -9,7 +9,6 @@ const SectionTitle = ({ text }) => {
           text-[clamp(1.5rem,5vw,3rem)] 
           max-w-[250px] sm:max-w-[400px] md:max-w-[500px] lg:max-w-[600px] 
           mx-auto 
-          mb-2
         "
       >
         {text}
