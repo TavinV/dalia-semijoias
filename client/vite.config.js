@@ -8,7 +8,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:3000", // onde seu backend está rodando
+        target: "https://dalia-semijoias-api.onrender.com", // onde seu backend está rodando
         changeOrigin: true,
       },
     },
