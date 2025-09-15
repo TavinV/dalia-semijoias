@@ -48,7 +48,7 @@ const ProductCard = ({id, product }) => {
             material: product.material,
             price: product.price,
             stock: product.stock,
-            image: `http://localhost:3000/uploads/${product.imageUrl}`,
+            image: `https://dalia-semijoias-api.onrender.com/uploads/${product.imageUrl}`,
         };
         addItem(item);
     };
