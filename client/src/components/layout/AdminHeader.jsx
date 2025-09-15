@@ -26,13 +26,13 @@ const AdminHeader = () => {
                     </NavLink>
                     <NavLink
                         to="/create-product"
-                        className="bg-primary text-dark py-2 px-4 rounded hover:bg-dark-accent hover:text-secondary transition"
+                        className="bg-primary text-black py-2 px-4 rounded hover:bg-dark-accent hover:text-secondary transition"
                     >
                         Cadastrar Produto
                     </NavLink>
                     <button
                         onClick={handleLogout}
-                        className="text-white hover:text-red-400 transition"
+                        className="text-black hover:text-red-400 transition"
                     >
                         Sair
                     </button>
@@ -76,14 +76,14 @@ const AdminHeader = () => {
                 <div className="md:hidden px-4 pb-4 font-title">
                     <NavLink
                         to="/"
-                        className="block py-2 text-white hover:text-primary transition"
+                        className="block py-2 text-white hover:text-black transition"
                         onClick={() => setMenuOpen(false)}
                     >
                         Estoque
                     </NavLink>
                     <NavLink
                         to="/create-product"
-                        className="block py-2 text-white hover:text-primary transition"
+                        className="block py-2 text-white hover:text-black transition"
                         onClick={() => setMenuOpen(false)}
                     >
                         Cadastrar Produto
