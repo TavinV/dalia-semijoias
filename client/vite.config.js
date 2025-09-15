@@ -4,13 +4,5 @@ import react from '@vitejs/plugin-react'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  server: {
-    proxy: {
-      "/api": {
-        target: "https://dalia-semijoias-api.onrender.com", // onde seu backend está rodando
-        changeOrigin: true,
-      },
-    },
-  },
+  plugins: [react(), tailwindcss()]
 })
