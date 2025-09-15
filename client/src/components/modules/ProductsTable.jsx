@@ -49,7 +49,7 @@ const ProductsTable = () => {
     };
 
     if (loading) return <p>Carregando produtos...</p>;
-    if (error) return <p>Erro ao carregar produtos: {error}</p>;
+    if (error) return <p>Erro ao carregar produtos: {error.message || String(error)}</p>;
 
     return (
         <div className="overflow-x-auto w-full">
@@ -75,22 +75,28 @@ const ProductsTable = () => {
                     </thead>
                     <tbody>
                         {productsState.map((product) => (
-                            <tr key={product.id} className="even:bg-[#F3F3F3] hover:bg-primary/10">
+                            <tr key={product.id || product.dalia_id} className="even:bg-[#F3F3F3] hover:bg-primary/10">
                                 <td className="p-2 md:p-4">
-                                    <img
-                                        src={`https://dalia-semijoias-api.onrender.com/uploads/${product.imageUrl}`}
-                                        alt={product.name}
-                                        className="w-24 h-24 object-cover"
-                                    />
+                                    {product.imageUrl ? (
+                                        <img
+                                            src={`https://dalia-semijoias-api.onrender.com/uploads/${product.imageUrl}`}
+                                            alt={product.name}
+                                            className="w-24 h-24 object-cover"
+                                        />
+                                    ) : (
+                                        <span className="text-gray-400">Sem imagem</span>
+                                    )}
                                 </td>
-                                <td className="p-2 md:p-4">{product.name}</td>
-                                <td className="p-2 md:p-4">{product.dalia_id}</td>
-                                <td className="p-2 md:p-4 hidden sm:table-cell">{product.description}</td>
-                                <td className="p-2 md:p-4">R$ {product.price.toFixed(2)}</td>
-                                <td className="p-2 md:p-4 hidden md:table-cell">{product.category}</td>
-                                <td className="p-2 md:p-4 hidden md:table-cell">{product.material}</td>
-                                <td className="p-2 md:p-4 hidden md:table-cell">{product.gender}</td>
-                                <td className="p-2 md:p-4">{product.stock}</td>
+                                <td className="p-2 md:p-4">{String(product.name || "")}</td>
+                                <td className="p-2 md:p-4">{String(product.dalia_id || "")}</td>
+                                <td className="p-2 md:p-4 hidden sm:table-cell">{String(product.description || "")}</td>
+                                <td className="p-2 md:p-4">
+                                    {product.price ? `R$ ${Number(product.price).toFixed(2)}` : "—"}
+                                </td>
+                                <td className="p-2 md:p-4 hidden md:table-cell">{String(product.category || "")}</td>
+                                <td className="p-2 md:p-4 hidden md:table-cell">{String(product.material || "")}</td>
+                                <td className="p-2 md:p-4 hidden md:table-cell">{String(product.gender || "")}</td>
+                                <td className="p-2 md:p-4">{String(product.stock || 0)}</td>
                                 <td className="p-2 md:p-4 flex flex-col justify-center gap-1">
                                     <button
                                         className="bg-primary text-secondary px-2 py-1 flex items-center rounded hover:bg-primary/80 transition"
