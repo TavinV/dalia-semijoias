@@ -1,4 +1,5 @@
 import Logo from "../ui/Logo";
+import { NavLink } from "react-router-dom";
 
 const colection = [
                     "Aneis",
@@ -45,7 +46,9 @@ const Footer = () => {
                 </div>
             </footer>
             <div className="w-full h-10 flex items-center justify-center font-light text-center bg-[#E7D7C9]">
-                © 2025 Dália Concept todos os direitos reservados
+                <NavLink to="/dashboard">
+                    © 2025 Dália Concept todos os direitos reservados
+                </NavLink>
             </div>
         </>
     );
