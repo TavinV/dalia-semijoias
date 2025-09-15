@@ -155,6 +155,7 @@ const CreateProductForm = () => {
                             onChange={handleChange}
                             className="w-full border border-primary rounded-lg px-3 py-2 resize-none"
                             rows="3"
+                            minlength="10"
                             required
                         />
                     </div>
