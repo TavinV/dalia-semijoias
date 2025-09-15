@@ -11,6 +11,7 @@ export function useAuth() {
         const token = localStorage.getItem("jwtToken");
         if (!token) {
             setLoading(false);
+            setIsAuthenticated(false)
             return;
         }
 
@@ -19,6 +20,7 @@ export function useAuth() {
                 const res = await api.get("/auth/validate-session", {
                     headers: { Authorization: `Bearer ${token}` },
                 });
+                console.log(res)
                 if (res.status === 200 && res.data.success) {
                     setIsAuthenticated(true);
                     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;

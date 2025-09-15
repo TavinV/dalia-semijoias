@@ -1,5 +1,4 @@
 import Logo from "../components/ui/Logo";
-
 import { NavLink } from "react-router-dom";
 
 import { useEffect } from "react";
@@ -21,12 +20,13 @@ const Header = () => {
 const Dashboard = () => {
     const navigate = useNavigate();
     const { isAuthenticated, authLoading } = useAuth();
-
+    
     useEffect(() => {
         if (!authLoading && isAuthenticated === false) {
             navigate("/login");
         }
     }, [isAuthenticated, authLoading, navigate]);
+
     if (authLoading || isAuthenticated === null) return <p>Carregando...</p>;
 
     return (
