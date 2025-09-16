@@ -91,7 +91,7 @@ const ProductCard = ({ id, product }) => {
                             Valor: <br />
                             <span
                                 className="text-primary font-bold"
-                                style={{ fontSize: "clamp(1rem, 1.5vw, 1.3rem)" }}
+                                style={{ fontSize: "clamp(0.9rem, 1.5vw, 1.3rem)" }}
                             >
                                 R$ {product.price.toFixed(2)}
                             </span>
