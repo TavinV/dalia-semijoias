@@ -41,7 +41,6 @@ const Footer = () => {
                     <ul className="list-none flex flex-col gap-1">
                         <li><a className="text-blue-600" href="https://www.instagram.com/daliaa.concept">Instagram</a></li>
                         <li className="mt-2">+55 11 94703-4640</li>
-                        <li className="mt-2">+55 11 97515-3050</li>
                     </ul>
                 </div>
             </footer>

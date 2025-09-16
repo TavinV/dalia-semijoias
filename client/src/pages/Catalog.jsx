@@ -8,12 +8,14 @@ import Carousel from '../components/navigation/Carousel.jsx';
 import SectionTitle from '../components/ui/SectionTitle.jsx';
 
 import { useProducts } from '../hooks/useProducts.jsx';
+import { useNavigate } from 'react-router-dom';
 
 function Catalog() {
   const { products, loading, error } = useProducts();
-  
+  const navigate = useNavigate();
+
   if (!loading && error) {
-    return <><h1>Erro ao carregar os produtos</h1><br /><pre>{error}</pre></>
+    navigate('/error?message=' + error)
   }
 
   // agrupa produtos por categoria
