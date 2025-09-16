@@ -34,7 +34,7 @@ const Carousel = () => {
     };
 
     return (
-        <div className="no-scrollbar relative w-full flex items-center justify-center">
+        <div id="carousel" className="no-scrollbar relative w-full flex items-center justify-center">
             {/* Botões sobre os cards */}
             <button
                 onClick={scrollLeft}

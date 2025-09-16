@@ -1,12 +1,22 @@
-const Banner = () =>{
+const Banner = () => {
+    const handleScrollTo = (id) => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "center" });
+        }
+    };
+
     return (
-        <div href="#" className="w-screen h-auto mt-8">
+        <div 
+            className="w-screen h-auto mt-8 cursor-pointer"
+            onClick={() => handleScrollTo("carousel")} 
+        >
             <picture>
                 {/* Telas pequenas */}
-                <source media="(max-width: 768px)" srcSet="/mobile-banner.png" className="w-screen h-auto"/>
+                <source media="(max-width: 768px)" srcSet="/mobile-banner.png" className="w-screen h-auto" />
                 
                 {/* Telas grandes */}
-                <img srcSet="/banner.png" className="w-screen h-auto"/>
+                <img srcSet="/desktop-banner.png" className="w-screen h-auto" />
             </picture>
         </div>
     );
