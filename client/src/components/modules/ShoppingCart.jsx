@@ -109,7 +109,10 @@ const ShoppingCart = () => {
       {/* Header */}
       <header className="flex items-center justify-between border-b-2 border-gray-300 pb-2">
         <h2 className="text-xl font-bold">Carrinho</h2>
-        <h2 className="text-xl font-bold">{cart.length > 1 ? cart.length + " itens" : "1 item"} </h2>
+        {
+          cart.length >= 1 &&
+          <h2 className="text-xl font-bold">{cart.length > 1 ? cart.length + " itens" : "1 item"} </h2>
+        }
       </header>
 
       {/* Cabeçalho das colunas (somente md+) */}
