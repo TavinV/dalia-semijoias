@@ -60,7 +60,6 @@ const productController = {
 
             if (req.file) {
                 const imageUrl = req.file.path; // URL do Cloudinary
-                console.log("URL FINAL: " + imageUrl)
                 produto = await ProductServices.updateProduct(id, {
                     ...req.body,
                     imageUrl,
