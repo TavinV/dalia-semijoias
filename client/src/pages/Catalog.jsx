@@ -11,6 +11,10 @@ import { useProducts } from '../hooks/useProducts.jsx';
 
 function Catalog() {
   const { products, loading, error } = useProducts();
+  
+  if (!loading && error) {
+    return <><h1>Erro ao carregar os produtos</h1><br /><pre>{error}</pre></>
+  }
 
   // agrupa produtos por categoria
   const grouped = products?.reduce((acc, product) => {

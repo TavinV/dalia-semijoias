@@ -7,7 +7,7 @@ const Button = ({ text, onClick }) => {
                  overflow-hidden text-ellipsis"
             onClick={onClick}
             style={{
-                fontSize: "clamp(0.7rem, 2vw, 1rem)", // menor valor para caber em telas pequenas
+                fontSize: "clamp(0.7rem, 2vw, 1rem)",
                 whiteSpace: "nowrap",
             }}
         >
@@ -21,26 +21,15 @@ const MaterialBadge = ({ material }) => {
     const metalLower = metal.toLowerCase();
     const text = type;
 
-    const baseClasses = "rounded-full text-xs md:text-sm p-1 shadow text-center flex justify-center items-center min-w-[1.5rem] min-h-[1.5rem] md:min-w-[2rem] md:min-h-[2rem] font-title flex-shrink-0";
+    const baseClasses =
+        "rounded-full text-xs md:text-sm p-1 shadow text-center flex justify-center items-center min-w-[1.5rem] min-h-[1.5rem] md:min-w-[2rem] md:min-h-[2rem] font-title flex-shrink-0";
 
     if (metalLower === "ouro") {
-        return (
-            <div className={`${baseClasses} bg-[#EFBD52] text-white`}>
-                {text}
-            </div>
-        );
+        return <div className={`${baseClasses} bg-[#EFBD52] text-white`}>{text}</div>;
     } else if (metalLower === "prata") {
-        return (
-            <div className={`${baseClasses} bg-[#EDE9E3] text-black`}>
-                {text}
-            </div>
-        );
+        return <div className={`${baseClasses} bg-[#EDE9E3] text-black`}>{text}</div>;
     } else if (metalLower === "outros") {
-        return (
-            <div className={`${baseClasses} bg-[#494949] text-white`}>
-                N/A
-            </div>
-        );
+        return <div className={`${baseClasses} bg-[#494949] text-white`}>N/A</div>;
     }
 
     return null;
@@ -64,10 +53,20 @@ const ProductCard = ({ id, product }) => {
     return (
         <div
             id={id}
-            className="flex flex-col overflow-hidden shadow-xl w-full font-title bg-white"
+            className="
+                flex flex-col 
+                overflow-hidden 
+                shadow-xl 
+                font-title 
+                bg-white 
+                w-full 
+                h-full 
+                max-w-full 
+                m-0
+            "
         >
             {/* Imagem */}
-            <div className="aspect-square w-full relative">
+            <div className="aspect-square w-full relative flex-shrink-0">
                 <img
                     src={product.imageUrl}
                     alt={product.name}
@@ -77,7 +76,6 @@ const ProductCard = ({ id, product }) => {
 
             {/* Conteúdo inferior */}
             <div className="flex flex-col flex-1 p-4 bg-[#F0F0F0]">
-                {/* Título */}
                 <h3
                     className="uppercase font-regular mb-4 text-ellipsis overflow-hidden whitespace-nowrap"
                     style={{ fontSize: "clamp(1rem, 2vw, 1.5rem)" }}
@@ -86,9 +84,7 @@ const ProductCard = ({ id, product }) => {
                     {product.name}
                 </h3>
 
-                {/* Infos + Botão */}
                 <div className="flex flex-col justify-end flex-1">
-                    {/* Infos */}
                     <div className="flex justify-between items-center gap-2">
                         <p className="whitespace-nowrap text-sm md:text-base">
                             Valor:
@@ -103,7 +99,6 @@ const ProductCard = ({ id, product }) => {
                         </div>
                     </div>
 
-                    {/* Botão */}
                     <div className="mt-4 md:mt-8 w-full flex justify-center">
                         <Button text="Adicionar ao carrinho" onClick={handleAddToCart} />
                     </div>
@@ -112,5 +107,6 @@ const ProductCard = ({ id, product }) => {
         </div>
     );
 };
+
 
 export default ProductCard;
