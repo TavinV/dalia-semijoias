@@ -91,14 +91,14 @@ const ProductCard = ({ id, product }) => {
                             Valor: <br />
                             <span
                                 className="text-primary font-bold"
-                                style={{ fontSize: "clamp(1.125rem, 2vw, 1.5rem)" }}
+                                style={{ fontSize: "clamp(1rem, 1.5vw, 1.3rem)" }}
                             >
                                 R$ {product.price.toFixed(2)}
                             </span>
                         </p>
 
                         <div className="text-sm md:text-base flex flex-col items-start md:items-end gap-2">
-                            <span>Banhado a</span>
+                            <span>Banhado:</span>
                             <MaterialBadge material={product.material} />
                         </div>
                     </div>
