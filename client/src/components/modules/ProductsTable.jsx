@@ -95,7 +95,7 @@ const ProductsTable = () => {
                                 <td className="p-2 md:p-4">
                                     {product.imageUrl ? (
                                         <img
-                                            src={`https://dalia-semijoias-api.onrender.com/uploads/${product.imageUrl}`}
+                                            src={product.imageUrl}
                                             alt={product.name}
                                             className="w-24 h-24 object-cover"
                                         />
