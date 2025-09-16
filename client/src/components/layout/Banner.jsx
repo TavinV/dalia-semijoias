@@ -8,12 +8,12 @@ const Banner = () => {
 
     return (
         <div 
-            className="w-screen h-auto mt-8 cursor-pointer"
+            className="w-screen h-auto cursor-pointer"
             onClick={() => handleScrollTo("carousel")} 
         >
             <picture>
                 {/* Telas pequenas */}
-                <source media="(max-width: 768px)" srcSet="/mobile-banner.png" className="w-screen h-auto" />
+                <source media="(max-width: 768px)" srcSet="/banner-mobile.png" className="" />
                 
                 {/* Telas grandes */}
                 <img srcSet="/desktop-banner.png" className="w-screen h-auto" />
