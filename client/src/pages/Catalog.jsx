@@ -36,12 +36,25 @@ function Catalog() {
 
   return (
     <>
+      {/* LOADING sofisticado */}
+      {loading && (
+        <div className="fixed h-screen w-screen inset-0 z-50 flex items-center justify-center bg-white">
+          <div className="flex flex-col items-center gap-6 animate-fade-in">
+            {/* Logo */}
+            <img
+              src="/logo.png"
+              alt="Logo"
+              className="w-20 h-auto animate-pulse"
+            />
+
+            {/* Spinner elegante */}
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </div>
+      )}
+
       <Header />
       <Banner />
-
-      {loading && (
-        <div className="w-screen h-screen bg-black opacity-20 fixed top-0 left-0 z-20"></div>
-      )}
 
       <Main>
         <SectionTitle text={"Coleção"} />
