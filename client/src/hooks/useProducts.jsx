@@ -9,6 +9,7 @@ export function useProducts() {
     useEffect(() => {
         api.get("/products")
             .then((res) => {
+                console.log(res.data.data)
                 setProducts(res.data.data); // supondo que sua API retorna um array de produtos
             })
             .catch((err) => {

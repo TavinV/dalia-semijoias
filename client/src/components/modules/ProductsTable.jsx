@@ -1,4 +1,3 @@
-// ProductsTable.jsx
 import { useState, useEffect } from "react";
 import { useProducts } from "../../hooks/useProducts";
 import EditProductModal from "./EditProductModal";
@@ -11,6 +10,7 @@ const ProductsTable = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [deleteProduct, setDeleteProduct] = useState(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         if (products) setProductsState(products);
@@ -48,14 +48,30 @@ const ProductsTable = () => {
         );
     };
 
+    // Filtrar produtos pelo termo de busca
+    const filteredProducts = productsState.filter((p) =>
+        p.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     if (loading) return <p>Carregando produtos...</p>;
     if (error) return <p>Erro ao carregar produtos: {error.message || String(error)}</p>;
 
     return (
         <div className="overflow-x-auto w-full">
-            {productsState.length === 0 ? (
+            {/* Barra de busca */}
+            <div className="flex justify-end mb-4">
+                <input
+                    type="text"
+                    placeholder="Buscar por nome..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:ring-primary focus:outline-none w-full max-w-sm"
+                />
+            </div>
+
+            {filteredProducts.length === 0 ? (
                 <div className="text-center py-10 text-gray-600">
-                    Nenhum produto encontrado no banco de dados.
+                    Nenhum produto encontrado.
                 </div>
             ) : (
                 <table className="min-w-[900px] md:min-w-full border-collapse bg-secondary">
@@ -74,7 +90,7 @@ const ProductsTable = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {productsState.map((product) => (
+                        {filteredProducts.map((product) => (
                             <tr key={product.id || product.dalia_id} className="even:bg-[#F3F3F3] hover:bg-primary/10">
                                 <td className="p-2 md:p-4">
                                     {product.imageUrl ? (

@@ -58,7 +58,7 @@ const ProductCard = ({id, product }) => {
             {/* Imagem (cobre a parte superior, sem padding) */}
             <div className="aspect-square w-full relative">
                 <img
-                    src={`https://dalia-semijoias-api.onrender.com/uploads/${product.imageUrl}`}
+                    src={product.imageUrl}
                     alt={product.name}
                     className="absolute inset-0 w-full h-full object-cover"
                 />

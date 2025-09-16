@@ -96,7 +96,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
             const res = await api.put("/products/" + product.dalia_id, payload, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-
+            
             if (res.data.success) {
                 onSave(res.data.data);
                 onClose();

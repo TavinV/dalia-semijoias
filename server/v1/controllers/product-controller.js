@@ -25,13 +25,23 @@ const productController = {
                 throw new ValidationError("Imagem do produto é obrigatória");
             }
 
-            // Gerando o dalia_id a partir do nome
-            const dalia_id = name.trim().split(/\s+/)[0].toLowerCase() + '-' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
-            const imageUrl = req.file.filename;
+            const dalia_id =
+                name.trim().split(/\s+/)[0].toLowerCase() +
+                "-" +
+                Math.floor(Math.random() * 1000000)
+                    .toString()
+                    .padStart(6, "0");
 
-            const product = await ProductServices.createProduct({ ...req.body, dalia_id, imageUrl });
+            // pega a URL pública do Cloudinary
+            const imageUrl = req.file.path;
 
-            return ApiResponse.CREATED(res, product, 'Produto criado com sucesso');
+            const product = await ProductServices.createProduct({
+                ...req.body,
+                dalia_id,
+                imageUrl,
+            });
+
+            return ApiResponse.CREATED(res, product, "Produto criado com sucesso");
         } catch (error) {
             if (error instanceof ValidationError) {
                 return ApiResponse.BADREQUEST(res, error.message);
@@ -39,24 +49,27 @@ const productController = {
             if (error instanceof ConflictError) {
                 return ApiResponse.CONFLICT(res, error.message);
             }
-            return ApiResponse.ERROR(res, 'Erro ao criar produto: ' + error.message);
+            return ApiResponse.ERROR(res, "Erro ao criar produto: " + error.message);
         }
     },
 
     async updateProduct(req, res) {
-
         try {
             const { id } = req.params;
             let produto;
 
             if (req.file) {
-                const imageUrl = req.file.filename;
-                produto = await ProductServices.updateProduct(id, { ...req.body, imageUrl });
+                const imageUrl = req.file.path; // URL do Cloudinary
+                console.log("URL FINAL: " + imageUrl)
+                produto = await ProductServices.updateProduct(id, {
+                    ...req.body,
+                    imageUrl,
+                });
             } else {
                 produto = await ProductServices.updateProduct(id, req.body);
             }
-
-            return ApiResponse.OK(res, produto, 'Produto atualizado com sucesso');
+            
+            return ApiResponse.OK(res, produto, "Produto atualizado com sucesso");
         } catch (error) {
             if (error instanceof ValidationError) {
                 return ApiResponse.BADREQUEST(res, error.message);
@@ -64,7 +77,7 @@ const productController = {
             if (error instanceof NotFoundError) {
                 return ApiResponse.NOTFOUND(res, error.message);
             }
-            return ApiResponse.ERROR(res, 'Erro ao atualizar produto: ' + error.message);
+            return ApiResponse.ERROR(res, "Erro ao atualizar produto: " + error.message);
         }
     },
 
