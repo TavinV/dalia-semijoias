@@ -24,7 +24,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
     const [error, setError] = useState(null);
 
     const genderOptions = ["Masculino", "Feminino"];
-    const materialOptions = ["Ouro 18k", "Prata 925"];
+    const materialOptions = ["Ouro 18k", "Prata 925", "Outros"];
     const categoryOptions = [
         "anéis",
         "body chains",
@@ -96,7 +96,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
             const res = await api.put("/products/" + product.dalia_id, payload, {
                 headers: { "Content-Type": "multipart/form-data" },
             });
-            
+
             if (res.data.success) {
                 onSave(res.data.data);
                 onClose();

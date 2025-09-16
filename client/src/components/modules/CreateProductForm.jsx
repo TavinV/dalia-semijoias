@@ -24,7 +24,7 @@ const CreateProductForm = () => {
     const [successMessage, setSuccessMessage] = useState(null);
 
     const genderOptions = ["Masculino", "Feminino"];
-    const materialOptions = ["Ouro 18k", "Prata 925"];
+    const materialOptions = ["Ouro 18k", "Prata 925", "Outros"];
     const categoryOptions = [
         "anéis",
         "body chains",
@@ -81,7 +81,7 @@ const CreateProductForm = () => {
 
         try {
             const res = await api.post("/products", payload, {
-                headers: { "Content-Type": "multipart/form-data" },
+                headers: { "Content-Type": "multipart/form-data"},
             });
 
             if (res.data.success) {
@@ -103,7 +103,7 @@ const CreateProductForm = () => {
                 setError(res.data.message || "Erro ao cadastrar o produto");
             }
         } catch (err) {
-            setError(err?.message || "Erro ao cadastrar o produto");
+            setError(err?.response?.data?.message || "Erro ao cadastrar o produto");
         } finally {
             setLoading(false);
         }
@@ -155,7 +155,7 @@ const CreateProductForm = () => {
                             onChange={handleChange}
                             className="w-full border border-primary rounded-lg px-3 py-2 resize-none"
                             rows="3"
-                            minlength="10"
+                            minLength="10"
                             required
                         />
                     </div>

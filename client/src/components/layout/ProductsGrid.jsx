@@ -6,19 +6,18 @@ const ProductsGrid = ({ products, title }) => {
         <div className="flex flex-col mt-20">
             <SectionTitle text={title} />
 
-            <div className="w-full">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {products.map((product) =>
-                        product.stock >= 1 ? (
-                            <ProductCard
-                                id={product.dalia_id}
-                                key={product._id}
-                                product={product}
-                            />
-                        ) : null
-                    )}
-                </div>
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-[90%] mx-auto">
+                {products.map((product) =>
+                    product.stock >= 1 ? (
+                        <ProductCard
+                            id={product.dalia_id}
+                            key={product._id}
+                            product={product}
+                        />
+                    ) : null
+                )}
             </div>
+
         </div>
     );
 };
