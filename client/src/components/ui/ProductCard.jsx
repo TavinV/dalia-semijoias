@@ -59,9 +59,9 @@ const ProductCard = ({ id, product }) => {
                 shadow-xl 
                 font-title 
                 bg-white 
-                w-full 
+                lg:w-[20vw]
                 h-full 
-                max-w-full 
+                w-full
                 m-0
             "
         >
