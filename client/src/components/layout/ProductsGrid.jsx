@@ -6,7 +6,7 @@ const ProductsGrid = ({ products, title }) => {
         <div className="flex flex-col mt-20">
             <SectionTitle text={title} />
 
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-[90%] mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 w-full">
                 {products.map((product) =>
                     product.stock >= 1 ? (
                         <ProductCard
@@ -17,7 +17,6 @@ const ProductsGrid = ({ products, title }) => {
                     ) : null
                 )}
             </div>
-
         </div>
     );
 };

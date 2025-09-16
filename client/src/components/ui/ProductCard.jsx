@@ -21,21 +21,23 @@ const MaterialBadge = ({ material }) => {
     const metalLower = metal.toLowerCase();
     const text = type;
 
+    const baseClasses = "rounded-full text-xs md:text-sm p-1 shadow text-center flex justify-center items-center min-w-[1.5rem] min-h-[1.5rem] md:min-w-[2rem] md:min-h-[2rem] font-title flex-shrink-0";
+
     if (metalLower === "ouro") {
         return (
-            <div className="rounded-full text-xs md:text-sm p-1 md:p-2 shadow bg-[#EFBD52] text-center flex justify-center items-center w-6 h-6 md:w-8 md:h-8 text-white font-title">
+            <div className={`${baseClasses} bg-[#EFBD52] text-white`}>
                 {text}
             </div>
         );
     } else if (metalLower === "prata") {
         return (
-            <div className="rounded-full text-xs md:text-sm p-1 md:p-2 shadow bg-[#EDE9E3] text-center flex justify-center items-center w-6 h-6 md:w-8 md:h-8 font-title">
+            <div className={`${baseClasses} bg-[#EDE9E3] text-black`}>
                 {text}
             </div>
         );
     } else if (metalLower === "outros") {
         return (
-            <div className="rounded-full text-xs md:text-sm p-1 md:p-2 shadow bg-[#494949] text-center text-white flex justify-center items-center w-6 h-6 md:w-8 md:h-8 font-title">
+            <div className={`${baseClasses} bg-[#494949] text-white`}>
                 N/A
             </div>
         );
@@ -62,7 +64,7 @@ const ProductCard = ({ id, product }) => {
     return (
         <div
             id={id}
-            className="flex flex-col overflow-hidden shadow-xl w-full font-title"
+            className="flex flex-col overflow-hidden shadow-xl w-full font-title bg-white"
         >
             {/* Imagem */}
             <div className="aspect-square w-full relative">
@@ -75,35 +77,33 @@ const ProductCard = ({ id, product }) => {
 
             {/* Conteúdo inferior */}
             <div className="flex flex-col flex-1 p-4 bg-[#F0F0F0]">
-                {/* Topo: título */}
+                {/* Título */}
                 <h3
-                    className="uppercase font-regular mb-4"
+                    className="uppercase font-regular mb-4 text-ellipsis overflow-hidden whitespace-nowrap"
                     style={{ fontSize: "clamp(1rem, 2vw, 1.5rem)" }}
+                    title={product.name}
                 >
                     {product.name}
                 </h3>
 
-                {/* Base: infos + botão (sempre alinhados no fundo) */}
+                {/* Infos + Botão */}
                 <div className="flex flex-col justify-end flex-1">
-                    {/* Infos (preço + material) */}
-                    <div className="flex justify-between gap-4 md:gap-0">
-                        <p style={{ fontSize: "clamp(0.875rem, 1.5vw, 1.125rem)" }}>
-                            Valor: <br />
-                            <span
-                                className="text-primary font-bold"
-                                style={{ fontSize: "clamp(0.9rem, 1.5vw, 1.3rem)" }}
-                            >
+                    {/* Infos */}
+                    <div className="flex justify-between items-center gap-2">
+                        <p className="whitespace-nowrap text-sm md:text-base">
+                            Valor:
+                            <span className="text-primary font-bold ml-1">
                                 R$ {product.price.toFixed(2)}
                             </span>
                         </p>
 
-                        <div className="text-sm md:text-base flex flex-col items-start md:items-end gap-2">
-                            <span>Banhado:</span>
+                        <div className="text-sm md:text-base flex flex-col items-end gap-1">
+                            <span className="hidden sm:block">Banhado:</span>
                             <MaterialBadge material={product.material} />
                         </div>
                     </div>
 
-                    {/* Botão (sempre embaixo) */}
+                    {/* Botão */}
                     <div className="mt-4 md:mt-8 w-full flex justify-center">
                         <Button text="Adicionar ao carrinho" onClick={handleAddToCart} />
                     </div>
@@ -112,6 +112,5 @@ const ProductCard = ({ id, product }) => {
         </div>
     );
 };
-
 
 export default ProductCard;

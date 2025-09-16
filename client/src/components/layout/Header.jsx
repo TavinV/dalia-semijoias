@@ -50,7 +50,7 @@ const Header = () => {
     };
 
     return (
-        <header className="w-screen sticky top-0 h-20 py-5 px-8 md:px-15 flex items-center justify-between bg-secondary shadow-2xl z-50">
+        <header className="w-full sticky top-0 h-20 py-5 px-8 md:px-15 flex items-center justify-between bg-secondary shadow-2xl z-50">
             <Logo />
             <NavItens onCartClick={toggleCartOpen} onSearchClick={toggleSearchbarOpen}/>
             {cartOpen && <ShoppingCart />}

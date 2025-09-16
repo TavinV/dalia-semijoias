@@ -4,7 +4,6 @@ import AdminHeader from "../components/layout/AdminHeader";
 import { NavLink } from "react-router-dom";
 
 import { useEffect } from "react";
-import { useProducts } from "../hooks/useProducts";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
