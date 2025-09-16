@@ -9,7 +9,7 @@ const ProductsGrid = ({ products, title }) => {
             <div
                 className="
                     grid 
-                    grid-cols-2 
+                    grid-cols-2
                     sm:grid-cols-2 
                     md:grid-cols-3 
                     lg:grid-cols-4 
@@ -17,8 +17,7 @@ const ProductsGrid = ({ products, title }) => {
                     w-full 
                     max-w-full 
                     m-0 
-                    p-0
-                    [grid-template-columns:repeat(auto-fill,minmax(0,1fr))]
+                    p-4
                 "
             >
                 {products.map((product) =>
