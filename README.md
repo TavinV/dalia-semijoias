@@ -105,7 +105,7 @@ VITE_WHATSAPP_NUMBER=5599999999999
 
 ### 1. Clone o repositório  
 ```bash
-git clone https://github.com/seu-usuario/dalia-semijoias.git
+git clone https://github.com/tavinv/dalia-semijoias.git
 ```
 
 ### 2. Instale dependências do backend  
