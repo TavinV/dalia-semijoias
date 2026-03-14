@@ -1,6 +1,6 @@
 const SectionTitle = ({ text }) => {
   return (
-    <div className="flex flex-col justify-center text-center py-10 px-4">
+    <div className="flex flex-col justify-center text-center py-2 px-4">
       <h1
         className="
           font-bold 

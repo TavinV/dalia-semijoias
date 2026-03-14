@@ -57,7 +57,7 @@ export function CartProvider({ children }) {
   };
   
 
-  const removeItem = (id) => setCart((prev) => prev.filter((p) => p.id !== id));
+  const removeItem = (product) => setCart((prev) => prev.filter((p) => p.id !== product.id));
   const clearCart = () => setCart([]);
 
   const total = cart.reduce((acc, i) => acc + i.subtotal, 0).toFixed(2);

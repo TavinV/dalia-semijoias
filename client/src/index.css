@@ -1,5 +1,6 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&family=Ibarra+Real+Nova:ital,wght@0,400..700;1,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&display=swap');
+@import "tailwindcss";
 
 @theme {
     --color-secondary: #EDE9E3;
@@ -11,6 +12,7 @@
     --font-title: "Ibarra Real Nova", serif;
     --font-highlight: "DM Serif Text", serif;
     --font-default: "Inter", sans-serif;
+    --font-fancy: "Bodoni Moda", serif;
 }
 
 body {
@@ -18,10 +20,22 @@ body {
     /* aplicando a cor secundaria como background do corpo */
     background-color: var(--color-secondary);
     overflow-x: hidden;
+    max-width: 100vw;
+}
+
+html {
+    scroll-behavior: smooth;
+    max-width: 100vw;
 }
 
 .no-scrollbar::-webkit-scrollbar {
     display: none;
+}
+
+@keyframes shimmer {
+    100% {
+        transform: translateX(100%);
+    }
 }
 
 .no-scrollbar {

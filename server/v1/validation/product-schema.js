@@ -41,11 +41,11 @@ const productSchema = Joi.object({
             "any.required": "O preço é obrigatório"
         }),
 
-    imageUrl: Joi.string()
-        .required()
+    images: Joi.array()
+        .items(Joi.string())
+        .min(1)
         .messages({
-            "string.empty": "A URL da imagem é obrigatória",
-            "any.required": "A imagem é obrigatória"
+            "array.min": "Ao menos uma imagem é obrigatória",
         }),
 
     category: Joi.string()

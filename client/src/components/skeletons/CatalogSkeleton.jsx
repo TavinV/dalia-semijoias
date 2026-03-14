@@ -1,10 +1,10 @@
-// ProductsGrid.jsx - Grid otimizada para cards maiores
-import ProductCard from "../ui/ProductCard";
-import SectionTitle from "../ui/SectionTitle";
+// components/skeletons/CatalogSkeleton.jsx
 
-const ProductsGrid = ({ products, title }) => {
+import SkeletonCard from "./SkeletonCard";
+
+const CatalogSkeleton = ({ count = 8 }) => {
   return (
-    <div className="flex flex-col  w-screen max-w-screen overflow-hidden">
+    <div className="w-full">
       <div
         className="
                     grid 
@@ -17,25 +17,19 @@ const ProductsGrid = ({ products, title }) => {
                     2xl:grid-cols-4    /* 4 colunas em telas enormes */
                     gap-6              /* gap maior entre cards */
                     sm:gap-8           /* gap ainda maior em telas maiores */
-                    w-full 
+                    w-screen 
                     max-w-full 
                     m-0 
                     p-6                /* padding maior nas laterais */
                     sm:p-8             /* padding ainda maior em telas maiores */
-                "
+      "
       >
-        {products.map((product) =>
-          product.stock >= 1 ? (
-            <ProductCard
-              id={product.dalia_id}
-              key={product._id}
-              product={product}
-            />
-          ) : null,
-        )}
+        {Array.from({ length: count }).map((_, i) => (
+          <SkeletonCard key={i} />
+        ))}
       </div>
     </div>
   );
 };
 
-export default ProductsGrid;
+export default CatalogSkeleton;

@@ -21,8 +21,8 @@ const productController = {
                 throw new ValidationError("Todos os campos são obrigatórios");
             }
 
-            if (!req.file) {
-                throw new ValidationError("Imagem do produto é obrigatória");
+            if (!req.files || req.files.length === 0) {
+                throw new ValidationError("Ao menos uma imagem do produto é obrigatória");
             }
 
             const dalia_id =
@@ -32,13 +32,12 @@ const productController = {
                     .toString()
                     .padStart(6, "0");
 
-            // pega a URL pública do Cloudinary
-            const imageUrl = req.file.path;
+            const images = req.files.map((file) => file.path); // URLs do Cloudinary
 
             const product = await ProductServices.createProduct({
                 ...req.body,
                 dalia_id,
-                imageUrl,
+                images,
             });
 
             return ApiResponse.CREATED(res, product, "Produto criado com sucesso");
@@ -58,16 +57,17 @@ const productController = {
             const { id } = req.params;
             let produto;
 
-            if (req.file) {
-                const imageUrl = req.file.path; // URL do Cloudinary
+            // Leitura do array de imagens do corpo da requisição (caso seja enviado como JSON)
+            if (req.files && req.files.length > 0) {
+                const images = req.files.map((file) => file.path); // URLs do Cloudinary
                 produto = await ProductServices.updateProduct(id, {
                     ...req.body,
-                    imageUrl,
+                    images,
                 });
             } else {
                 produto = await ProductServices.updateProduct(id, req.body);
             }
-            
+
             return ApiResponse.OK(res, produto, "Produto atualizado com sucesso");
         } catch (error) {
             if (error instanceof ValidationError) {

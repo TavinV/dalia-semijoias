@@ -57,9 +57,12 @@ const updateProductSchema = Joi.object({
             "string.max": "O material deve ter no máximo {#limit} caracteres",
         }),
 
-    imageUrl: Joi.string().messages({
-        "string.base": "A URL da imagem deve ser um texto válido",
-    }),
+    images: Joi.array()
+            .items(Joi.string())
+            .min(1)
+            .messages({
+                "array.min": "Ao menos uma imagem é obrigatória",
+            }),
 
     gender: Joi.string(),
     image: Joi.string()

@@ -6,8 +6,8 @@ import upload from '../middlewares/multer-upload.js';
 
 const router = express.Router();
 
-router.post('/', authenticateToken, upload.single('image'), productController.createProduct);
-router.put('/:id', authenticateToken, upload.single('image'), productController.updateProduct);
+router.post('/', authenticateToken, upload.array('images', 10), productController.createProduct);
+router.put('/:id', authenticateToken, upload.array('images', 10), productController.updateProduct);
 
 router.get('/:id', productController.getProductByDaliaId);
 router.get('/', productController.getAllProducts);
