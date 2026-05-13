@@ -184,7 +184,7 @@ const Dashboard = () => {
             <QuickAction
               icon={FiPlus}
               label="Novo Produto"
-              onClick={() => navigate("/admin/products/new")}
+              onClick={() => navigate("/create-product")}
               color="emerald"
             />
             <QuickAction icon={FiFilter} label="Filtrar" onClick={() => {}} />
