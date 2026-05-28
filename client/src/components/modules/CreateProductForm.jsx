@@ -32,13 +32,17 @@ const CreateProductForm = () => {
 
   const fileInputRef = useRef(null);
 
-  const genderOptions = ["Masculino", "Feminino"];
-  const materialOptions = ["Ouro 18k", "Prata 925", "Outros"];
+  const genderOptions = ["Masculino", "Feminino", "Unissex"];
+  const materialOptions = ["Ouro 18k", "Prata 925", "Ambas", "Outros"];
   const categoryOptions = [
     "anéis",
-    "brincos",
+    "body chains",
     "braceletes",
+    "brincos",
+    "chokers",
     "colares",
+    "correntes",
+    "lenços",
     "piercings",
     "pulseiras",
     "tornozeleiras",

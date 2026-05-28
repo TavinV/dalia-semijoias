@@ -41,8 +41,8 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
 
   const fileInputRef = useRef(null);
 
-  const genderOptions = ["Masculino", "Feminino"];
-  const materialOptions = ["Ouro 18k", "Prata 925", "Outros"];
+  const genderOptions = ["Masculino", "Feminino", "Unissex"];
+  const materialOptions = ["Ouro 18k", "Prata 925", "Ambas", "Outros"];
   const categoryOptions = [
     "anéis",
     "body chains",
@@ -51,6 +51,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
     "chokers",
     "colares",
     "correntes",
+    "lenços",
     "piercings",
     "pulseiras",
     "tornozeleiras",
