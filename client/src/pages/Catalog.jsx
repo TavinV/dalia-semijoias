@@ -99,6 +99,8 @@ const TopMesPublico = ({ products }) => {
   );
 };
 
+const PER_PAGE = 12;
+
 function Catalog() {
   const { products, loading, error } = useProducts();
   const navigate = useNavigate();
@@ -110,9 +112,40 @@ function Catalog() {
     else next.set("cat", cat);
     setSearchParams(next, { replace: true });
   };
-  const [selectedMaterial, setSelectedMaterial] = useState("todos");
-  const [selectedGender, setSelectedGender] = useState("todos");
+
+  // Multi-select de material e gênero
+  const [selectedMaterials, setSelectedMaterials] = useState([]);
+  const [selectedGenders, setSelectedGenders] = useState([]);
   const [maxPrice, setMaxPrice] = useState(null);
+
+  // Painel de filtros (escondido por padrão)
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Ordenação
+  const [sortBy, setSortBy] = useState("procuradas");
+
+  // Paginação
+  const [page, setPage] = useState(1);
+
+  // Mapa de "mais vendidos" do mês (nome → quantidade)
+  const [topSellersMap, setTopSellersMap] = useState({});
+  useEffect(() => {
+    let cancel = false;
+    api
+      .get("/sales/top-mes", { params: { limit: 100 } })
+      .then((r) => {
+        if (cancel) return;
+        const m = {};
+        for (const t of r.data.data || []) {
+          if (t.name) m[t.name.toLowerCase().trim()] = Number(t.qty) || 0;
+        }
+        setTopSellersMap(m);
+      })
+      .catch(() => {});
+    return () => {
+      cancel = true;
+    };
+  }, []);
 
   if (!loading && error) {
     navigate("/error?message=" + error);
@@ -171,18 +204,30 @@ function Catalog() {
       .toLowerCase()
       .trim();
 
-  // Filtra produtos por TODOS os filtros ativos
+  const toggleMaterial = (m) => {
+    setSelectedMaterials((prev) =>
+      prev.includes(m) ? prev.filter((x) => x !== m) : [...prev, m],
+    );
+  };
+  const toggleGender = (g) => {
+    setSelectedGenders((prev) =>
+      prev.includes(g) ? prev.filter((x) => x !== g) : [...prev, g],
+    );
+  };
+
+  // Filtra produtos por TODOS os filtros ativos (multi-select em material e gênero)
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     return products.filter((p) => {
+      if ((Number(p.stock) || 0) < 1) return false;
       if (selectedCategory !== "todos") {
         if (norm(p.category) !== norm(selectedCategory)) return false;
       }
-      if (selectedMaterial !== "todos") {
-        if (p.material !== selectedMaterial) return false;
+      if (selectedMaterials.length > 0) {
+        if (!selectedMaterials.includes(p.material)) return false;
       }
-      if (selectedGender !== "todos") {
-        if (norm(p.gender) !== norm(selectedGender)) return false;
+      if (selectedGenders.length > 0) {
+        if (!selectedGenders.includes(norm(p.gender))) return false;
       }
       if (maxPrice !== null && Number(p.price) > maxPrice) return false;
       return true;
@@ -190,52 +235,80 @@ function Catalog() {
   }, [
     products,
     selectedCategory,
-    selectedMaterial,
-    selectedGender,
+    selectedMaterials,
+    selectedGenders,
     maxPrice,
   ]);
 
+  // Ordenação
+  const sortedProducts = useMemo(() => {
+    const arr = [...filteredProducts];
+    if (sortBy === "caras") {
+      arr.sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0));
+    } else if (sortBy === "baratas") {
+      arr.sort((a, b) => (Number(a.price) || 0) - (Number(b.price) || 0));
+    } else {
+      // procuradas (default): mais vendidas primeiro, demais por preço desc
+      arr.sort((a, b) => {
+        const qa = topSellersMap[norm(a.name)] || 0;
+        const qb = topSellersMap[norm(b.name)] || 0;
+        if (qa !== qb) return qb - qa;
+        return (Number(b.price) || 0) - (Number(a.price) || 0);
+      });
+    }
+    return arr;
+  }, [filteredProducts, sortBy, topSellersMap]);
+
+  // Paginação
+  const totalPages = Math.max(1, Math.ceil(sortedProducts.length / PER_PAGE));
+  useEffect(() => {
+    setPage(1);
+  }, [
+    selectedCategory,
+    selectedMaterials,
+    selectedGenders,
+    maxPrice,
+    sortBy,
+  ]);
+  const safePage = Math.min(page, totalPages);
+  const paginatedProducts = useMemo(() => {
+    const start = (safePage - 1) * PER_PAGE;
+    return sortedProducts.slice(start, start + PER_PAGE);
+  }, [sortedProducts, safePage]);
+
   const limparFiltros = () => {
     setSelectedCategory("todos");
-    setSelectedMaterial("todos");
-    setSelectedGender("todos");
+    setSelectedMaterials([]);
+    setSelectedGenders([]);
     setMaxPrice(priceCap || null);
+    setSortBy("procuradas");
   };
 
   const algumFiltroAtivo =
     selectedCategory !== "todos" ||
-    selectedMaterial !== "todos" ||
-    selectedGender !== "todos" ||
+    selectedMaterials.length > 0 ||
+    selectedGenders.length > 0 ||
     (maxPrice !== null && maxPrice < priceCap);
-
-  // 3 categorias com mais produtos cadastrados (showcase)
-  const showcaseCategorias = useMemo(() => {
-    const counts = {};
-    for (const p of products || []) {
-      const c = p.category;
-      if (!c) continue;
-      counts[c] = (counts[c] || 0) + 1;
-    }
-    return Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3)
-      .map(([cat]) => cat);
-  }, [products]);
-
-  // Top 3 mais caros por categoria
-  const topPorCategoria = useMemo(() => {
-    const map = {};
-    for (const cat of showcaseCategorias) {
-      map[cat] = (products || [])
-        .filter((p) => p.category === cat)
-        .sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0))
-        .slice(0, 3);
-    }
-    return map;
-  }, [products, showcaseCategorias]);
 
   const labelDaCategoria = (cat) =>
     categories.find((c) => c.id === cat)?.label || cat;
+
+  // Páginas visíveis na paginação (compacta com elipses)
+  const pageNumbers = useMemo(() => {
+    if (totalPages <= 7) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    const pages = new Set([1, 2, totalPages - 1, totalPages, safePage, safePage - 1, safePage + 1]);
+    const sortedPages = [...pages].filter((p) => p >= 1 && p <= totalPages).sort((a, b) => a - b);
+    const withGaps = [];
+    for (let i = 0; i < sortedPages.length; i++) {
+      withGaps.push(sortedPages[i]);
+      if (sortedPages[i + 1] && sortedPages[i + 1] - sortedPages[i] > 1) {
+        withGaps.push("…");
+      }
+    }
+    return withGaps;
+  }, [totalPages, safePage]);
 
   return (
     <>
@@ -257,176 +330,259 @@ function Catalog() {
             </p>
           </div>
 
-          {/* Filtros — material + gênero + preço (categoria fica no SearchBar) */}
-          <div className="mt-10 sm:mt-12 space-y-6">
-            {/* Indicador de categoria ativa (se houver) */}
-            {selectedCategory !== "todos" && (
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
-                  Categoria selecionada:
+          {/* Toolbar: botão Filtros + ordenação */}
+          <div className="mt-10 sm:mt-12 flex flex-wrap items-center justify-between gap-3 max-w-5xl mx-auto">
+            <button
+              onClick={() => setShowFilters((v) => !v)}
+              className={`inline-flex items-center gap-2 px-5 py-2.5 border rounded-full font-fancy text-sm transition-all ${
+                showFilters || algumFiltroAtivo
+                  ? "bg-[#967965] text-white border-[#967965]"
+                  : "bg-white text-gray-700 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+              }`}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="6" y1="12" x2="18" y2="12" />
+                <line x1="9" y1="18" x2="15" y2="18" />
+              </svg>
+              Filtros
+              {algumFiltroAtivo && (
+                <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-white text-[#967965] rounded-full font-bold">
+                  {(selectedCategory !== "todos" ? 1 : 0) +
+                    selectedMaterials.length +
+                    selectedGenders.length +
+                    (maxPrice !== null && maxPrice < priceCap ? 1 : 0)}
                 </span>
-                <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#967965] text-white rounded-full text-sm font-fancy">
-                  {categories.find((c) => c.id === selectedCategory)?.label ||
-                    selectedCategory}
-                  <button
-                    onClick={() => setSelectedCategory("todos")}
-                    className="hover:text-white/70 transition-colors"
-                    aria-label="Remover filtro de categoria"
-                  >
-                    ×
-                  </button>
-                </span>
-              </div>
-            )}
+              )}
+            </button>
 
-            {/* Material + Gênero lado a lado */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-gray-400 text-center mb-3 font-fancy">
-                  Material
-                </p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {materials.map((m) => (
-                    <button
-                      key={m.id}
-                      onClick={() => setSelectedMaterial(m.id)}
-                      disabled={loading}
-                      className={`px-4 py-1.5 text-sm font-fancy rounded-full border transition-all ${
-                        selectedMaterial === m.id
-                          ? "bg-[#967965] text-white border-[#967965]"
-                          : "bg-transparent text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
-                      }`}
-                    >
-                      {m.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <p className="text-xs uppercase tracking-[0.2em] text-gray-400 text-center mb-3 font-fancy">
-                  Gênero
-                </p>
-                <div className="flex flex-wrap justify-center gap-2">
-                  {genders.map((g) => (
-                    <button
-                      key={g.id}
-                      onClick={() => setSelectedGender(g.id)}
-                      disabled={loading}
-                      className={`px-4 py-1.5 text-sm font-fancy rounded-full border transition-all ${
-                        selectedGender === g.id
-                          ? "bg-[#967965] text-white border-[#967965]"
-                          : "bg-transparent text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
-                      }`}
-                    >
-                      {g.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div className="flex items-center gap-2 font-fancy">
+              <label htmlFor="sort" className="text-xs uppercase tracking-[0.2em] text-gray-400">
+                Ordenar
+              </label>
+              <select
+                id="sort"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="bg-transparent text-sm text-gray-700 border-b border-gray-300 focus:border-[#967965] outline-none px-2 py-1 cursor-pointer"
+              >
+                <option value="procuradas">Mais procuradas</option>
+                <option value="caras">Mais caras</option>
+                <option value="baratas">Mais baratas</option>
+              </select>
             </div>
-
-            {/* Slider de preço */}
-            {priceCap > 0 && (
-              <div className="max-w-xl mx-auto px-2">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
-                    Faixa de preço
-                  </p>
-                  <p className="text-sm font-fancy text-[#967965]">
-                    Até {formatBRL(maxPrice ?? priceCap)}
-                  </p>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={priceCap}
-                  step={10}
-                  value={maxPrice ?? priceCap}
-                  onChange={(e) =>
-                    setMaxPrice(parseInt(e.target.value, 10))
-                  }
-                  className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[#967965]"
-                  style={{
-                    background: `linear-gradient(to right, #967965 0%, #967965 ${
-                      (((maxPrice ?? priceCap) - 0) / priceCap) * 100
-                    }%, #e5e7eb ${
-                      (((maxPrice ?? priceCap) - 0) / priceCap) * 100
-                    }%, #e5e7eb 100%)`,
-                  }}
-                />
-                <div className="flex justify-between text-[10px] text-gray-400 mt-1">
-                  <span>R$ 0</span>
-                  <span>{formatBRL(priceCap)}</span>
-                </div>
-              </div>
-            )}
-
-            {/* Limpar filtros */}
-            {algumFiltroAtivo && (
-              <div className="flex justify-center">
-                <button
-                  onClick={limparFiltros}
-                  className="text-xs uppercase tracking-[0.2em] text-gray-500 hover:text-[#967965] font-fancy underline-offset-4 hover:underline transition-colors"
-                >
-                  Limpar filtros
-                </button>
-              </div>
-            )}
           </div>
+
+          {/* Painel de filtros (abre ao clicar em "Filtros") */}
+          {showFilters && (
+            <div className="mt-6 max-w-5xl mx-auto bg-white/60 backdrop-blur-sm border border-[#967965]/20 rounded-lg p-5 sm:p-6 space-y-6">
+              {/* Material — multi-select */}
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-3 font-fancy">
+                  Material{" "}
+                  {selectedMaterials.length > 0 && (
+                    <span className="text-[#967965]">
+                      ({selectedMaterials.length} selecionado{selectedMaterials.length === 1 ? "" : "s"})
+                    </span>
+                  )}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {materials.filter((m) => m.id !== "todos").map((m) => {
+                    const active = selectedMaterials.includes(m.id);
+                    return (
+                      <button
+                        key={m.id}
+                        onClick={() => toggleMaterial(m.id)}
+                        className={`px-4 py-1.5 text-sm font-fancy rounded-full border transition-all ${
+                          active
+                            ? "bg-[#967965] text-white border-[#967965]"
+                            : "bg-white text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+                        }`}
+                      >
+                        {active && <span className="mr-1">✓</span>}
+                        {m.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Gênero — multi-select */}
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-3 font-fancy">
+                  Gênero{" "}
+                  {selectedGenders.length > 0 && (
+                    <span className="text-[#967965]">
+                      ({selectedGenders.length} selecionado{selectedGenders.length === 1 ? "" : "s"})
+                    </span>
+                  )}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {genders.filter((g) => g.id !== "todos").map((g) => {
+                    const active = selectedGenders.includes(g.id);
+                    return (
+                      <button
+                        key={g.id}
+                        onClick={() => toggleGender(g.id)}
+                        className={`px-4 py-1.5 text-sm font-fancy rounded-full border transition-all ${
+                          active
+                            ? "bg-[#967965] text-white border-[#967965]"
+                            : "bg-white text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+                        }`}
+                      >
+                        {active && <span className="mr-1">✓</span>}
+                        {g.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Preço */}
+              {priceCap > 0 && (
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs uppercase tracking-[0.2em] text-gray-500 font-fancy">
+                      Faixa de preço
+                    </p>
+                    <p className="text-sm font-fancy text-[#967965]">
+                      Até {formatBRL(maxPrice ?? priceCap)}
+                    </p>
+                  </div>
+                  <input
+                    type="range"
+                    min={0}
+                    max={priceCap}
+                    step={10}
+                    value={maxPrice ?? priceCap}
+                    onChange={(e) => setMaxPrice(parseInt(e.target.value, 10))}
+                    className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[#967965]"
+                    style={{
+                      background: `linear-gradient(to right, #967965 0%, #967965 ${
+                        (((maxPrice ?? priceCap) - 0) / priceCap) * 100
+                      }%, #e5e7eb ${
+                        (((maxPrice ?? priceCap) - 0) / priceCap) * 100
+                      }%, #e5e7eb 100%)`,
+                    }}
+                  />
+                  <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+                    <span>R$ 0</span>
+                    <span>{formatBRL(priceCap)}</span>
+                  </div>
+                </div>
+              )}
+
+              {/* Botão de limpar */}
+              {algumFiltroAtivo && (
+                <div className="flex justify-end pt-2 border-t border-gray-100">
+                  <button
+                    onClick={limparFiltros}
+                    className="text-xs uppercase tracking-[0.2em] text-gray-500 hover:text-[#967965] font-fancy underline-offset-4 hover:underline transition-colors"
+                  >
+                    Limpar todos os filtros
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Tag visual da categoria ativa (vinda do SearchBar via URL) */}
+          {selectedCategory !== "todos" && (
+            <div className="flex items-center justify-center gap-2 mt-6">
+              <span className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
+                Categoria:
+              </span>
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#967965] text-white rounded-full text-sm font-fancy">
+                {labelDaCategoria(selectedCategory)}
+                <button
+                  onClick={() => setSelectedCategory("todos")}
+                  className="hover:text-white/70 transition-colors"
+                  aria-label="Remover filtro de categoria"
+                >
+                  ×
+                </button>
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* 3 linhas — categorias em destaque com top 3 peças cada */}
-        {!loading && showcaseCategorias.length > 0 && (
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 space-y-10 sm:space-y-14">
-            <div className="text-center">
-              <h2 className="font-fancy text-2xl sm:text-3xl md:text-4xl text-gray-900 tracking-tight">
-                Explore por categoria
-              </h2>
-              <p className="font-fancy text-sm sm:text-base text-gray-500 mt-2">
-                As 3 mais procuradas, com as peças em destaque de cada
-              </p>
-            </div>
-
-            {showcaseCategorias.map((cat) => (
-              <div key={cat}>
-                <button
-                  onClick={() => setSelectedCategory(cat)}
-                  className="w-full group flex items-end justify-between gap-3 pb-3 border-b border-[#967965]/20 hover:border-[#967965] transition-colors text-left"
-                >
-                  <h3 className="font-fancy text-2xl sm:text-3xl text-gray-900 group-hover:text-[#967965] transition-colors">
-                    {labelDaCategoria(cat)}
-                  </h3>
-                  <span className="text-xs sm:text-sm font-fancy uppercase tracking-[0.2em] text-[#967965] group-hover:translate-x-1 transition-transform pb-1">
-                    Ver todos →
-                  </span>
-                </button>
-
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-5">
-                  {(topPorCategoria[cat] || []).map((p) => (
-                    <ProductCard
-                      key={p.dalia_id}
-                      id={p.dalia_id}
-                      product={p}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Grid de produtos com skeleton loading */}
+        {/* Contagem total + grid paginado */}
         <div className="px-4 sm:px-6 lg:px-8 pb-0">
+          {!loading && (
+            <div className="max-w-7xl mx-auto mb-4 flex items-center justify-between">
+              <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
+                {sortedProducts.length}{" "}
+                {sortedProducts.length === 1 ? "peça" : "peças"}
+              </p>
+              {totalPages > 1 && (
+                <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
+                  Página {safePage} de {totalPages}
+                </p>
+              )}
+            </div>
+          )}
+
           {loading ? (
             <CatalogSkeleton count={20} />
-          ) : filteredProducts && filteredProducts.length > 0 ? (
-            <ProductsGrid products={filteredProducts} />
+          ) : sortedProducts.length > 0 ? (
+            <>
+              <ProductsGrid products={paginatedProducts} />
+
+              {/* Paginação */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center gap-1 sm:gap-2 mt-8 mb-12">
+                  <button
+                    onClick={() => setPage(Math.max(1, safePage - 1))}
+                    disabled={safePage === 1}
+                    className="px-3 py-2 text-sm font-fancy text-gray-600 hover:text-[#967965] disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                  >
+                    ← Anterior
+                  </button>
+                  {pageNumbers.map((p, idx) =>
+                    p === "…" ? (
+                      <span
+                        key={`gap-${idx}`}
+                        className="px-2 text-gray-400 font-fancy"
+                      >
+                        …
+                      </span>
+                    ) : (
+                      <button
+                        key={p}
+                        onClick={() => setPage(p)}
+                        className={`min-w-[36px] h-9 px-2 text-sm font-fancy rounded-full transition-all ${
+                          p === safePage
+                            ? "bg-[#967965] text-white"
+                            : "text-gray-600 hover:bg-[#967965]/10 hover:text-[#967965]"
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ),
+                  )}
+                  <button
+                    onClick={() => setPage(Math.min(totalPages, safePage + 1))}
+                    disabled={safePage === totalPages}
+                    className="px-3 py-2 text-sm font-fancy text-gray-600 hover:text-[#967965] disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                  >
+                    Próxima →
+                  </button>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-16">
               <p className="font-fancy text-gray-400 text-lg">
-                Nenhum produto encontrado nesta categoria
+                Nenhum produto encontrado com esses filtros
               </p>
+              {algumFiltroAtivo && (
+                <button
+                  onClick={limparFiltros}
+                  className="mt-3 text-sm font-fancy text-[#967965] underline-offset-4 hover:underline"
+                >
+                  Limpar filtros
+                </button>
+              )}
             </div>
           )}
         </div>
