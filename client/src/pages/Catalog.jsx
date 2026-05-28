@@ -120,6 +120,8 @@ function Catalog() {
 
   // Painel de filtros (escondido por padrão)
   const [showFilters, setShowFilters] = useState(false);
+  // Painel de categorias (escondido por padrão)
+  const [showCategoriesPanel, setShowCategoriesPanel] = useState(false);
 
   // Ordenação
   const [sortBy, setSortBy] = useState("procuradas");
@@ -330,31 +332,62 @@ function Catalog() {
             </p>
           </div>
 
-          {/* Toolbar: botão Filtros + ordenação */}
+          {/* Toolbar: botão Categorias + Filtros + ordenação */}
           <div className="mt-10 sm:mt-12 flex flex-wrap items-center justify-between gap-3 max-w-5xl mx-auto">
-            <button
-              onClick={() => setShowFilters((v) => !v)}
-              className={`inline-flex items-center gap-2 px-5 py-2.5 border rounded-full font-fancy text-sm transition-all ${
-                showFilters || algumFiltroAtivo
-                  ? "bg-[#967965] text-white border-[#967965]"
-                  : "bg-white text-gray-700 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
-              }`}
-            >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <line x1="4" y1="6" x2="20" y2="6" />
-                <line x1="6" y1="12" x2="18" y2="12" />
-                <line x1="9" y1="18" x2="15" y2="18" />
-              </svg>
-              Filtros
-              {algumFiltroAtivo && (
-                <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-white text-[#967965] rounded-full font-bold">
-                  {(selectedCategory !== "todos" ? 1 : 0) +
-                    selectedMaterials.length +
-                    selectedGenders.length +
-                    (maxPrice !== null && maxPrice < priceCap ? 1 : 0)}
-                </span>
-              )}
-            </button>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => {
+                  setShowCategoriesPanel((v) => !v);
+                  if (!showCategoriesPanel) setShowFilters(false);
+                }}
+                className={`inline-flex items-center gap-2 px-5 py-2.5 border rounded-full font-fancy text-sm transition-all ${
+                  showCategoriesPanel || selectedCategory !== "todos"
+                    ? "bg-[#967965] text-white border-[#967965]"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+                }`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="7" height="7" />
+                  <rect x="14" y="3" width="7" height="7" />
+                  <rect x="3" y="14" width="7" height="7" />
+                  <rect x="14" y="14" width="7" height="7" />
+                </svg>
+                Categorias
+                {selectedCategory !== "todos" && (
+                  <span className="ml-1 px-2 py-0.5 text-[10px] bg-white text-[#967965] rounded-full font-bold">
+                    1
+                  </span>
+                )}
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowFilters((v) => !v);
+                  if (!showFilters) setShowCategoriesPanel(false);
+                }}
+                className={`inline-flex items-center gap-2 px-5 py-2.5 border rounded-full font-fancy text-sm transition-all ${
+                  showFilters || selectedMaterials.length > 0 || selectedGenders.length > 0 || (maxPrice !== null && maxPrice < priceCap)
+                    ? "bg-[#967965] text-white border-[#967965]"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+                }`}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="4" y1="6" x2="20" y2="6" />
+                  <line x1="6" y1="12" x2="18" y2="12" />
+                  <line x1="9" y1="18" x2="15" y2="18" />
+                </svg>
+                Filtros
+                {(selectedMaterials.length > 0 ||
+                  selectedGenders.length > 0 ||
+                  (maxPrice !== null && maxPrice < priceCap)) && (
+                  <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-white text-[#967965] rounded-full font-bold">
+                    {selectedMaterials.length +
+                      selectedGenders.length +
+                      (maxPrice !== null && maxPrice < priceCap ? 1 : 0)}
+                  </span>
+                )}
+              </button>
+            </div>
 
             <div className="flex items-center gap-2 font-fancy">
               <label htmlFor="sort" className="text-xs uppercase tracking-[0.2em] text-gray-400">
@@ -366,12 +399,43 @@ function Catalog() {
                 onChange={(e) => setSortBy(e.target.value)}
                 className="bg-transparent text-sm text-gray-700 border-b border-gray-300 focus:border-[#967965] outline-none px-2 py-1 cursor-pointer"
               >
-                <option value="procuradas">Mais procuradas</option>
-                <option value="caras">Mais caras</option>
-                <option value="baratas">Mais baratas</option>
+                <option value="procuradas">Mais vendidos</option>
+                <option value="caras">Preço: maior → menor</option>
+                <option value="baratas">Preço: menor → maior</option>
               </select>
             </div>
           </div>
+
+          {/* Painel de categorias (abre ao clicar em "Categorias") */}
+          {showCategoriesPanel && (
+            <div className="mt-6 max-w-5xl mx-auto bg-white/60 backdrop-blur-sm border border-[#967965]/20 rounded-lg p-5 sm:p-6">
+              <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-3 font-fancy">
+                Escolha uma categoria
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((c) => {
+                  const active = selectedCategory === c.id;
+                  return (
+                    <button
+                      key={c.id}
+                      onClick={() => {
+                        setSelectedCategory(c.id);
+                        setShowCategoriesPanel(false);
+                      }}
+                      className={`px-4 py-1.5 text-sm font-fancy rounded-full border transition-all ${
+                        active
+                          ? "bg-[#967965] text-white border-[#967965]"
+                          : "bg-white text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+                      }`}
+                    >
+                      {active && <span className="mr-1">✓</span>}
+                      {c.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Painel de filtros (abre ao clicar em "Filtros") */}
           {showFilters && (
