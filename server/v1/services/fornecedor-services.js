@@ -9,6 +9,7 @@ import { round2, computeRoi } from "../utils/numeric.js";
 
 import {
     AppError,
+    ConflictError,
     NotFoundError,
     ValidationError,
 } from "../errors/errors.js";
@@ -19,10 +20,24 @@ class FornecedorServices {
             const { error, value } = fornecedorSchema.validate(data);
             if (error) throw new ValidationError(error.details[0].message);
 
+            const existing = await Fornecedor.findOne({
+                nome: { $regex: new RegExp(`^${value.nome}$`, "i") },
+            });
+            if (existing) {
+                throw new ConflictError(
+                    "Já existe um fornecedor cadastrado com esse nome"
+                );
+            }
+
             const fornecedor = new Fornecedor(value);
             return await fornecedor.save();
         } catch (error) {
             if (error instanceof AppError) throw error;
+            if (error.code === 11000) {
+                throw new ConflictError(
+                    "Já existe um fornecedor cadastrado com esse nome"
+                );
+            }
             throw new AppError("Erro ao criar fornecedor: " + error.message);
         }
     }
@@ -32,6 +47,18 @@ class FornecedorServices {
             const { error, value } = updateFornecedorSchema.validate(data);
             if (error) throw new ValidationError(error.details[0].message);
 
+            if (value.nome) {
+                const existing = await Fornecedor.findOne({
+                    _id: { $ne: id },
+                    nome: { $regex: new RegExp(`^${value.nome}$`, "i") },
+                });
+                if (existing) {
+                    throw new ConflictError(
+                        "Já existe outro fornecedor com esse nome"
+                    );
+                }
+            }
+
             const fornecedor = await Fornecedor.findByIdAndUpdate(id, value, {
                 new: true,
                 runValidators: true,
@@ -40,6 +67,11 @@ class FornecedorServices {
             return fornecedor;
         } catch (error) {
             if (error instanceof AppError) throw error;
+            if (error.code === 11000) {
+                throw new ConflictError(
+                    "Já existe outro fornecedor com esse nome"
+                );
+            }
             throw new AppError("Erro ao atualizar fornecedor: " + error.message);
         }
     }

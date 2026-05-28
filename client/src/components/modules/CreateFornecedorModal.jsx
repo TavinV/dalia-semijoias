@@ -12,19 +12,49 @@ import api from "../../api/axios";
 
 const initialForm = { nome: "", telefone: "", cidade: "", observacao: "" };
 
+// Mapeia mensagem do backend para o campo certo (erro inline)
+const inferField = (msg = "") => {
+  const m = msg.toLowerCase();
+  if (m.includes("nome")) return "nome";
+  if (m.includes("telefone")) return "telefone";
+  if (m.includes("cidade")) return "cidade";
+  if (m.includes("observa")) return "observacao";
+  return null;
+};
+
 const CreateFornecedorModal = ({ isOpen, onClose, onSuccess }) => {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+    if (fieldErrors[name]) {
+      setFieldErrors({ ...fieldErrors, [name]: null });
+    }
+  };
+
+  const validateLocal = () => {
+    const errs = {};
+    if (!form.nome.trim()) errs.nome = "O nome é obrigatório";
+    else if (form.nome.trim().length < 2)
+      errs.nome = "O nome deve ter pelo menos 2 caracteres";
+    if (form.telefone && !/^\(\d{2}\) \d{4,5}-\d{4}$/.test(form.telefone)) {
+      errs.telefone = "Use o formato (00) 00000-0000";
+    }
+    return errs;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const errs = validateLocal();
+    if (Object.keys(errs).length > 0) {
+      setFieldErrors(errs);
+      return;
+    }
     setLoading(true);
-    setError(null);
+    setFieldErrors({});
     try {
       const res = await api.post("/fornecedores", form);
       if (res.data.success) {
@@ -32,10 +62,16 @@ const CreateFornecedorModal = ({ isOpen, onClose, onSuccess }) => {
         setForm(initialForm);
         onClose();
       } else {
-        setError(res.data.message || "Erro ao cadastrar fornecedor");
+        const msg = res.data.message || "Erro ao cadastrar fornecedor";
+        const field = inferField(msg);
+        if (field) setFieldErrors({ [field]: msg });
+        else setFieldErrors({ _form: msg });
       }
     } catch (err) {
-      setError(err?.response?.data?.message || "Erro ao cadastrar fornecedor");
+      const msg = err?.response?.data?.message || "Erro ao cadastrar fornecedor";
+      const field = inferField(msg);
+      if (field) setFieldErrors({ [field]: msg });
+      else setFieldErrors({ _form: msg });
     } finally {
       setLoading(false);
     }
@@ -68,10 +104,10 @@ const CreateFornecedorModal = ({ isOpen, onClose, onSuccess }) => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              {error && (
+            <form onSubmit={handleSubmit} noValidate className="p-6 space-y-5">
+              {fieldErrors._form && (
                 <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
-                  {error}
+                  {fieldErrors._form}
                 </div>
               )}
 
@@ -90,11 +126,17 @@ const CreateFornecedorModal = ({ isOpen, onClose, onSuccess }) => {
                     value={form.nome}
                     onChange={handleChange}
                     placeholder="Ex: Joias Atacado SP"
-                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
-                    required
+                    className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none transition-colors ${
+                      fieldErrors.nome
+                        ? "border-red-300 focus:border-red-500"
+                        : "border-gray-200 focus:border-[#967965]"
+                    }`}
                     autoFocus
                   />
                 </div>
+                {fieldErrors.nome && (
+                  <p className="text-xs text-red-600 mt-1.5">{fieldErrors.nome}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -113,9 +155,18 @@ const CreateFornecedorModal = ({ isOpen, onClose, onSuccess }) => {
                       value={form.telefone}
                       onChange={handleChange}
                       placeholder="(11) 99999-9999"
-                      className="w-full pl-10 pr-3 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
+                      className={`w-full pl-10 pr-3 py-3 border rounded-lg focus:outline-none transition-colors ${
+                        fieldErrors.telefone
+                          ? "border-red-300 focus:border-red-500"
+                          : "border-gray-200 focus:border-[#967965]"
+                      }`}
                     />
                   </div>
+                  {fieldErrors.telefone && (
+                    <p className="text-xs text-red-600 mt-1.5">
+                      {fieldErrors.telefone}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -181,7 +232,7 @@ const CreateFornecedorModal = ({ isOpen, onClose, onSuccess }) => {
                   ) : (
                     <FiSave size={16} />
                   )}
-                  Salvar
+                  Salvar fornecedor
                 </button>
               </div>
             </form>

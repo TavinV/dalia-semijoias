@@ -2,6 +2,7 @@ import FornecedorServices from "../services/fornecedor-services.js";
 import ApiResponse from "../utils/api-response.js";
 
 import {
+    ConflictError,
     NotFoundError,
     ValidationError,
 } from "../errors/errors.js";
@@ -18,6 +19,9 @@ const fornecedorController = {
         } catch (error) {
             if (error instanceof ValidationError) {
                 return ApiResponse.BADREQUEST(res, error.message);
+            }
+            if (error instanceof ConflictError) {
+                return ApiResponse.CONFLICT(res, error.message);
             }
             return ApiResponse.ERROR(
                 res,
@@ -38,6 +42,9 @@ const fornecedorController = {
         } catch (error) {
             if (error instanceof ValidationError) {
                 return ApiResponse.BADREQUEST(res, error.message);
+            }
+            if (error instanceof ConflictError) {
+                return ApiResponse.CONFLICT(res, error.message);
             }
             if (error instanceof NotFoundError) {
                 return ApiResponse.NOTFOUND(res, error.message);

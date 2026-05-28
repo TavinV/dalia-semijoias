@@ -8,6 +8,7 @@ import {
   FiCalendar,
   FiDollarSign,
   FiFileText,
+  FiAlertTriangle,
 } from "react-icons/fi";
 import api from "../../api/axios";
 
@@ -29,6 +30,21 @@ const todayISO = () => {
   const tz = d.getTimezoneOffset();
   const local = new Date(d.getTime() - tz * 60000);
   return local.toISOString().slice(0, 10);
+};
+
+const yesterdayISO = () => {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  const tz = d.getTimezoneOffset();
+  const local = new Date(d.getTime() - tz * 60000);
+  return local.toISOString().slice(0, 10);
+};
+
+// Cor do ROI em 3 níveis (verde >=100%, amarelo 50-99%, vermelho <50%)
+const roiTierClass = (roi) => {
+  if (roi >= 100) return "text-emerald-700";
+  if (roi >= 50) return "text-amber-600";
+  return "text-red-600";
 };
 
 const round2 = (v) => {
@@ -71,6 +87,10 @@ const blankItem = () => ({
 
 const ItemRow = ({ item, index, onChange, onRemove, canRemove }) => {
   const m = calcMetricas(item);
+  const precoMenorQueCusto =
+    Number(item.precoVenda) > 0 &&
+    Number(item.precoVenda) < m.custoTotalUnit;
+  const embalagemZero = Number(item.custoEmbalagem) <= 0;
 
   const set = (field, value) => onChange(index, { ...item, [field]: value });
 
@@ -197,9 +217,7 @@ const ItemRow = ({ item, index, onChange, onRemove, canRemove }) => {
         </div>
         <div>
           <p className="text-gray-400">ROI</p>
-          <p
-            className={`font-medium ${m.roiUnit >= 0 ? "text-emerald-700" : "text-red-600"}`}
-          >
+          <p className={`font-medium ${roiTierClass(m.roiUnit)}`}>
             {m.roiUnit.toFixed(2)}%
           </p>
         </div>
@@ -208,6 +226,28 @@ const ItemRow = ({ item, index, onChange, onRemove, canRemove }) => {
           <p className="font-medium text-gray-800">{m.margem.toFixed(2)}%</p>
         </div>
       </div>
+
+      {(precoMenorQueCusto || embalagemZero) && (
+        <div className="bg-amber-50 border border-amber-200 rounded-md px-3 py-2 flex items-start gap-2 text-xs text-amber-800">
+          <FiAlertTriangle
+            size={13}
+            className="text-amber-600 flex-shrink-0 mt-0.5"
+          />
+          <div className="space-y-0.5">
+            {precoMenorQueCusto && (
+              <p>
+                Preço de venda menor que o custo total — você teria prejuízo nessa
+                peça.
+              </p>
+            )}
+            {embalagemZero && (
+              <p>
+                Custo de embalagem está em R$ 0,00. Confira se é mesmo isso.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -243,6 +283,10 @@ const CreateCompraFornecedorModal = ({
 
   const roiAgregado = totais.custoTotal > 0
     ? round2((totais.lucro / totais.custoTotal) * 100)
+    : 0;
+
+  const margemMedia = totais.faturamento > 0
+    ? round2((totais.lucro / totais.faturamento) * 100)
     : 0;
 
   const updateItem = (i, next) =>
@@ -367,6 +411,35 @@ const CreateCompraFornecedorModal = ({
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Data da compra *
                   </label>
+                  <div className="inline-flex bg-gray-100 rounded-lg p-1 mb-2">
+                    {[
+                      { key: "hoje", label: "Hoje", value: todayISO() },
+                      { key: "ontem", label: "Ontem", value: yesterdayISO() },
+                      { key: "outra", label: "Outra data", value: null },
+                    ].map((opt) => {
+                      const active =
+                        opt.key === "outra"
+                          ? dataCompra !== todayISO() &&
+                            dataCompra !== yesterdayISO()
+                          : dataCompra === opt.value;
+                      return (
+                        <button
+                          key={opt.key}
+                          type="button"
+                          onClick={() => {
+                            if (opt.value) setDataCompra(opt.value);
+                          }}
+                          className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                            active
+                              ? "bg-white shadow text-[#967965]"
+                              : "text-gray-600 hover:text-gray-900"
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                   <div className="relative">
                     <FiCalendar
                       className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
@@ -456,7 +529,7 @@ const CreateCompraFornecedorModal = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-[#967965]/5 rounded-lg p-4">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 bg-[#967965]/5 rounded-lg p-4">
                 <div>
                   <p className="text-[10px] uppercase tracking-wider text-gray-500">
                     Total peças
@@ -488,9 +561,17 @@ const CreateCompraFornecedorModal = ({
                     ROI agregado
                   </p>
                   <p
-                    className={`font-fancy text-xl ${roiAgregado >= 0 ? "text-emerald-700" : "text-red-600"}`}
+                    className={`font-fancy text-xl ${roiTierClass(roiAgregado)}`}
                   >
                     {roiAgregado.toFixed(2)}%
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-gray-500">
+                    Margem média
+                  </p>
+                  <p className="font-fancy text-xl text-gray-900">
+                    {margemMedia.toFixed(2)}%
                   </p>
                 </div>
               </div>

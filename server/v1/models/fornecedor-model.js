@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const fornecedorSchema = new mongoose.Schema(
     {
-        nome: { type: String, required: true, trim: true },
+        nome: { type: String, required: true, trim: true, unique: true },
         telefone: { type: String, trim: true, default: "" },
         cidade: { type: String, trim: true, default: "" },
         observacao: { type: String, trim: true, default: "" },
@@ -13,7 +13,6 @@ const fornecedorSchema = new mongoose.Schema(
     }
 );
 
-fornecedorSchema.index({ nome: 1 });
 fornecedorSchema.index({ ativo: 1 });
 
 fornecedorSchema.set("toJSON", { virtuals: true });
