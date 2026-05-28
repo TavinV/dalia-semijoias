@@ -1,5 +1,3 @@
-import Marquee from "./Marquee.jsx";
-
 const Banner = () => {
     const handleScrollTo = (id) => {
         const el = document.getElementById(id);
@@ -21,9 +19,6 @@ const Banner = () => {
                     <img srcSet="/desktop-banner.png" className="w-screen h-auto" alt="Dália Semijoias" />
                 </picture>
             </div>
-
-            {/* Letreiro em onda */}
-            <Marquee />
 
             {/* CTA — Veja nossa coleção */}
             <div className="flex justify-center py-6 sm:py-8 bg-[#EDE9E3]">
