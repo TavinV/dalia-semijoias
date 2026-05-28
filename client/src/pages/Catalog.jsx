@@ -1,5 +1,5 @@
 // Catalog.jsx
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Header from "../components/layout/Header.jsx";
 import Banner from "../components/layout/Banner.jsx";
 import Main from "../components/layout/Main.jsx";
@@ -11,6 +11,12 @@ import { useProducts } from "../hooks/useProducts.jsx";
 import { useNavigate } from "react-router-dom";
 import SkeletonCard from "../components/skeletons/SkeletonCard.jsx";
 import api from "../api/axios.js";
+
+const formatBRL = (v) =>
+  (Number(v) || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 
 // Top 5 peças mais vendidas no mês (público)
 const TopMesPublico = ({ products }) => {
@@ -96,33 +102,103 @@ function Catalog() {
   const { products, loading, error } = useProducts();
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState("todos");
+  const [selectedMaterial, setSelectedMaterial] = useState("todos");
+  const [selectedGender, setSelectedGender] = useState("todos");
+  const [maxPrice, setMaxPrice] = useState(null);
 
   if (!loading && error) {
     navigate("/error?message=" + error);
   }
 
-  // Lista de categorias disponíveis
+  // Categorias visíveis no catálogo público
   const categories = [
     { id: "todos", label: "Todos" },
     { id: "anéis", label: "Anéis" },
-    { id: "brincos", label: "Brincos" },
-    { id: "colares", label: "Colares" },
-    { id: "pulseiras", label: "Pulseiras" },
+    { id: "body chains", label: "Body Chains" },
     { id: "braceletes", label: "Braceletes" },
-    { id: "piercings", label: "Piercings Fake" },
-    { id: "masculino", label: "Masculino" },
+    { id: "brincos", label: "Brincos" },
+    { id: "chokers", label: "Chokers" },
+    { id: "colares", label: "Colares" },
+    { id: "correntes", label: "Correntes" },
+    { id: "lenços", label: "Lenços" },
+    { id: "piercings", label: "Piercings" },
+    { id: "pulseiras", label: "Pulseiras" },
+    { id: "tornozeleiras", label: "Tornozeleiras" },
   ];
 
-  // Filtra produtos por categoria
-  const filteredProducts =
-    selectedCategory === "todos"
-      ? products
-      : selectedCategory === "masculino"
-        ? products?.filter((p) => p.gender?.toLowerCase() === "masculino")
-        : products?.filter((p) => {
-            const categorySlug = p.category?.toLowerCase().replace(/\s+/g, "");
-            return categorySlug === selectedCategory;
-          });
+  const materials = [
+    { id: "todos", label: "Todos" },
+    { id: "Ouro 18k", label: "Ouro 18k" },
+    { id: "Prata 925", label: "Prata 925" },
+    { id: "Outros", label: "Outros" },
+  ];
+
+  const genders = [
+    { id: "todos", label: "Todos" },
+    { id: "feminino", label: "Feminino" },
+    { id: "masculino", label: "Masculino" },
+    { id: "unissex", label: "Unissex" },
+  ];
+
+  // Limite do slider de preço (arredonda pra cima de 50 em 50)
+  const priceCap = useMemo(() => {
+    const max = (products || []).reduce(
+      (acc, p) => Math.max(acc, Number(p.price) || 0),
+      0,
+    );
+    if (max <= 0) return 0;
+    return Math.ceil(max / 50) * 50;
+  }, [products]);
+
+  // Inicializa maxPrice quando os produtos carregarem
+  useEffect(() => {
+    if (priceCap > 0 && maxPrice === null) {
+      setMaxPrice(priceCap);
+    }
+  }, [priceCap, maxPrice]);
+
+  const norm = (s) =>
+    (s || "")
+      .toString()
+      .toLowerCase()
+      .trim();
+
+  // Filtra produtos por TODOS os filtros ativos
+  const filteredProducts = useMemo(() => {
+    if (!products) return [];
+    return products.filter((p) => {
+      if (selectedCategory !== "todos") {
+        if (norm(p.category) !== norm(selectedCategory)) return false;
+      }
+      if (selectedMaterial !== "todos") {
+        if (p.material !== selectedMaterial) return false;
+      }
+      if (selectedGender !== "todos") {
+        if (norm(p.gender) !== norm(selectedGender)) return false;
+      }
+      if (maxPrice !== null && Number(p.price) > maxPrice) return false;
+      return true;
+    });
+  }, [
+    products,
+    selectedCategory,
+    selectedMaterial,
+    selectedGender,
+    maxPrice,
+  ]);
+
+  const limparFiltros = () => {
+    setSelectedCategory("todos");
+    setSelectedMaterial("todos");
+    setSelectedGender("todos");
+    setMaxPrice(priceCap || null);
+  };
+
+  const algumFiltroAtivo =
+    selectedCategory !== "todos" ||
+    selectedMaterial !== "todos" ||
+    selectedGender !== "todos" ||
+    (maxPrice !== null && maxPrice < priceCap);
 
   return (
     <>
@@ -144,30 +220,131 @@ function Catalog() {
             </p>
           </div>
 
-          {/* Filtros por categoria */}
-          <div className="mt-10 sm:mt-12">
-            <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-              {categories.map((category) => (
-                <button
-                  key={category.id}
-                  onClick={() => setSelectedCategory(category.id)}
-                  disabled={loading}
-                  className={`
-                    px-5 sm:px-6 py-2.5 sm:py-3 
-                    text-sm sm:text-base font-fancy
-                    transition-all duration-300 ease-in-out
-                    ${
-                      selectedCategory === category.id
-                        ? "bg-[#967965] text-white shadow-md hover:bg-[#7a6150]"
-                        : "bg-transparent text-gray-600 hover:text-[#967965] hover:bg-[#967965]/5"
-                    }
-                    ${loading ? "opacity-50 cursor-not-allowed" : ""}
-                  `}
-                >
-                  {category.label}
-                </button>
-              ))}
+          {/* Filtros — categoria + material + gênero + preço */}
+          <div className="mt-10 sm:mt-12 space-y-6">
+            {/* Categorias */}
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-gray-400 text-center mb-3 font-fancy">
+                Categoria
+              </p>
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    onClick={() => setSelectedCategory(category.id)}
+                    disabled={loading}
+                    className={`
+                      px-4 sm:px-5 py-2 sm:py-2.5
+                      text-sm sm:text-base font-fancy
+                      transition-all duration-300 ease-in-out
+                      ${
+                        selectedCategory === category.id
+                          ? "bg-[#967965] text-white shadow-md hover:bg-[#7a6150]"
+                          : "bg-transparent text-gray-600 hover:text-[#967965] hover:bg-[#967965]/5"
+                      }
+                      ${loading ? "opacity-50 cursor-not-allowed" : ""}
+                    `}
+                  >
+                    {category.label}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {/* Material + Gênero lado a lado */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-gray-400 text-center mb-3 font-fancy">
+                  Material
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {materials.map((m) => (
+                    <button
+                      key={m.id}
+                      onClick={() => setSelectedMaterial(m.id)}
+                      disabled={loading}
+                      className={`px-4 py-1.5 text-sm font-fancy rounded-full border transition-all ${
+                        selectedMaterial === m.id
+                          ? "bg-[#967965] text-white border-[#967965]"
+                          : "bg-transparent text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+                      }`}
+                    >
+                      {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-[0.2em] text-gray-400 text-center mb-3 font-fancy">
+                  Gênero
+                </p>
+                <div className="flex flex-wrap justify-center gap-2">
+                  {genders.map((g) => (
+                    <button
+                      key={g.id}
+                      onClick={() => setSelectedGender(g.id)}
+                      disabled={loading}
+                      className={`px-4 py-1.5 text-sm font-fancy rounded-full border transition-all ${
+                        selectedGender === g.id
+                          ? "bg-[#967965] text-white border-[#967965]"
+                          : "bg-transparent text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+                      }`}
+                    >
+                      {g.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Slider de preço */}
+            {priceCap > 0 && (
+              <div className="max-w-xl mx-auto px-2">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
+                    Faixa de preço
+                  </p>
+                  <p className="text-sm font-fancy text-[#967965]">
+                    Até {formatBRL(maxPrice ?? priceCap)}
+                  </p>
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={priceCap}
+                  step={10}
+                  value={maxPrice ?? priceCap}
+                  onChange={(e) =>
+                    setMaxPrice(parseInt(e.target.value, 10))
+                  }
+                  className="w-full h-1.5 bg-gray-200 rounded-full appearance-none cursor-pointer accent-[#967965]"
+                  style={{
+                    background: `linear-gradient(to right, #967965 0%, #967965 ${
+                      (((maxPrice ?? priceCap) - 0) / priceCap) * 100
+                    }%, #e5e7eb ${
+                      (((maxPrice ?? priceCap) - 0) / priceCap) * 100
+                    }%, #e5e7eb 100%)`,
+                  }}
+                />
+                <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+                  <span>R$ 0</span>
+                  <span>{formatBRL(priceCap)}</span>
+                </div>
+              </div>
+            )}
+
+            {/* Limpar filtros */}
+            {algumFiltroAtivo && (
+              <div className="flex justify-center">
+                <button
+                  onClick={limparFiltros}
+                  className="text-xs uppercase tracking-[0.2em] text-gray-500 hover:text-[#967965] font-fancy underline-offset-4 hover:underline transition-colors"
+                >
+                  Limpar filtros
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
