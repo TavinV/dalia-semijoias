@@ -89,6 +89,30 @@ const SearchBar = ({ isOpen, onClose }) => {
     }
   };
 
+  // Ao clicar num resultado: limpa categoria, seta ?q=<nome exato> e vai
+  // pra home. O catálogo filtra pra mostrar essa peça e dá scroll até ela.
+  const handlePickResult = (product) => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("cat");
+    next.set("q", product.name);
+    setSearchParams(next, { replace: true });
+    onClose();
+    if (window.location.pathname !== "/") {
+      navigate({ pathname: "/", search: next.toString() });
+    }
+    // Tentar fazer scroll até o produto após a navegação/render
+    setTimeout(() => {
+      const el = document.getElementById(product.dalia_id);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else {
+        // fallback: rolar até o início da grade do catálogo
+        const grid = document.querySelector("[data-catalog-grid]");
+        if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }, 250);
+  };
+
   const highlightText = (text, highlight) => {
     if (!highlight.trim()) return text;
 
@@ -230,9 +254,9 @@ const SearchBar = ({ isOpen, onClose }) => {
                           <a
                             onClick={(e) => {
                               e.preventDefault();
-                              handleScrollTo(p.dalia_id);
+                              handlePickResult(p);
                             }}
-                            href={`#${p.dalia_id}`}
+                            href={`/?q=${encodeURIComponent(p.name)}`}
                             className="flex items-center gap-4 px-5 py-4 hover:bg-[#967965]/5 cursor-pointer transition-colors group"
                           >
                             {/* Miniatura do produto com borda sutil */}

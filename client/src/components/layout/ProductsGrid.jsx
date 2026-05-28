@@ -4,10 +4,10 @@ import SectionTitle from "../ui/SectionTitle";
 
 const ProductsGrid = ({ products, title }) => {
   return (
-    <div className="flex flex-col  w-screen max-w-screen overflow-hidden">
+    <div className="flex flex-col  w-screen max-w-screen overflow-hidden" data-catalog-grid>
       <div
         className="
-                    grid 
+                    grid
                     grid-cols-2        /* 2 coluna em mobile */
                     xs:grid-cols-2     /* 2 colunas em mobile grande */
                     sm:grid-cols-2     /* 2 colunas em tablet pequeno */
@@ -17,9 +17,9 @@ const ProductsGrid = ({ products, title }) => {
                     2xl:grid-cols-4    /* 4 colunas em telas enormes */
                     gap-6              /* gap maior entre cards */
                     sm:gap-8           /* gap ainda maior em telas maiores */
-                    w-full 
-                    max-w-full 
-                    m-0 
+                    w-full
+                    max-w-full
+                    m-0
                     p-6                /* padding maior nas laterais */
                     sm:p-8             /* padding ainda maior em telas maiores */
                 "
