@@ -250,7 +250,8 @@ const Fornecedores = () => {
       const stock = Math.max(0, Number(p.stock) || 0);
       const price = Number(p.price) || 0;
       const custo = Number(p.custo) || 0;
-      inv += custo * stock;
+      const custoEmb = Number(p.custoEmbalagem) || 0;
+      inv += (custo + custoEmb) * stock;
       fat += price * stock;
     }
     const lucro = fat - inv;

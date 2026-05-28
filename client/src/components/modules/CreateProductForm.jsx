@@ -12,6 +12,7 @@ const CreateProductForm = () => {
     description: "",
     price: "",
     custo: "",
+    custoEmbalagem: "",
     category: "",
     material: "",
     gender: "",
@@ -169,6 +170,7 @@ const CreateProductForm = () => {
           description: "",
           price: "",
           custo: "",
+          custoEmbalagem: "",
           category: "",
           material: "",
           gender: "",
@@ -250,7 +252,7 @@ const CreateProductForm = () => {
                     required
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Preço (R$) *
@@ -268,7 +270,7 @@ const CreateProductForm = () => {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Custo (R$)
+                      Custo peça (R$)
                     </label>
                     <input
                       type="number"
@@ -276,6 +278,21 @@ const CreateProductForm = () => {
                       min="0"
                       name="custo"
                       value={formData.custo}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Embalagem (R$)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      name="custoEmbalagem"
+                      value={formData.custoEmbalagem}
                       onChange={handleChange}
                       className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
                       placeholder="0,00"

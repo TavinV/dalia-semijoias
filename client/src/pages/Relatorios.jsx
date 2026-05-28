@@ -15,6 +15,9 @@ import {
   FiClock,
   FiShoppingBag,
   FiPackage,
+  FiSave,
+  FiSearch,
+  FiEdit3,
 } from "react-icons/fi";
 
 import AdminHeader from "../components/layout/AdminHeader";
@@ -109,7 +112,7 @@ const TabButton = ({ active, onClick, children }) => (
 const Relatorios = () => {
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useAuth();
-  const { products } = useProducts();
+  const { products, refetch: refetchProducts } = useProducts();
   const { sales } = useAllSales();
   const { sales: pendencias } = usePendencies();
   const [tipoSaida, setTipoSaida] = useState("");
@@ -119,12 +122,14 @@ const Relatorios = () => {
 
   const [tab, setTab] = useState("financeiro");
   const [modalOpen, setModalOpen] = useState(false);
+  const [searchCusto, setSearchCusto] = useState("");
 
   useEffect(() => {
     if (!authLoading && isAuthenticated === false) navigate("/login");
   }, [isAuthenticated, authLoading, navigate]);
 
   // Resumo financeiro a partir do estoque atual (reativo a edições/cadastros)
+  // Considera custo TOTAL = custo da peça + custo da embalagem
   const fin = useMemo(() => {
     let inv = 0;
     let fat = 0;
@@ -133,7 +138,9 @@ const Relatorios = () => {
       const stock = Math.max(0, Number(p.stock) || 0);
       const price = Number(p.price) || 0;
       const custo = Number(p.custo) || 0;
-      inv += custo * stock;
+      const custoEmb = Number(p.custoEmbalagem) || 0;
+      const custoTotal = custo + custoEmb;
+      inv += custoTotal * stock;
       fat += price * stock;
       totalUnidades += stock;
     }
@@ -250,6 +257,9 @@ const Relatorios = () => {
           </TabButton>
           <TabButton active={tab === "saidas"} onClick={() => setTab("saidas")}>
             Saídas
+          </TabButton>
+          <TabButton active={tab === "custos"} onClick={() => setTab("custos")}>
+            Custos
           </TabButton>
         </div>
 
@@ -565,12 +575,285 @@ const Relatorios = () => {
         )}
       </main>
 
+        {/* TAB: Custos */}
+        {tab === "custos" && (
+          <CustosSection
+            products={products}
+            onSaved={refetchProducts}
+            search={searchCusto}
+            setSearch={setSearchCusto}
+          />
+        )}
+      </main>
+
       <CreateSaidaModal
         isOpen={modalOpen}
         onClose={() => setModalOpen(false)}
         onSuccess={refetchSaidas}
       />
     </div>
+  );
+};
+
+// ============ Custos: edição rápida de custo + embalagem por produto ============
+const CustosSection = ({ products, onSaved, search, setSearch }) => {
+  const filtered = useMemo(() => {
+    const term = (search || "").toLowerCase().trim();
+    const list = term
+      ? (products || []).filter(
+          (p) =>
+            (p.name || "").toLowerCase().includes(term) ||
+            (p.category || "").toLowerCase().includes(term) ||
+            (p.dalia_id || "").toLowerCase().includes(term),
+        )
+      : products || [];
+    // Produtos sem custo ainda primeiro (mais úteis pra preencher)
+    return [...list].sort((a, b) => {
+      const aHas =
+        (Number(a.custo) || 0) > 0 || (Number(a.custoEmbalagem) || 0) > 0;
+      const bHas =
+        (Number(b.custo) || 0) > 0 || (Number(b.custoEmbalagem) || 0) > 0;
+      if (aHas !== bHas) return aHas ? 1 : -1;
+      return (a.name || "").localeCompare(b.name || "");
+    });
+  }, [products, search]);
+
+  const semCusto = (products || []).filter(
+    (p) => !((Number(p.custo) || 0) > 0 || (Number(p.custoEmbalagem) || 0) > 0),
+  ).length;
+
+  return (
+    <div className="space-y-4">
+      <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
+        <div className="flex items-start justify-between gap-3 mb-4">
+          <div>
+            <h2 className="font-fancy text-xl text-gray-900 flex items-center gap-2">
+              <FiEdit3 className="text-[#967965]" /> Custos por peça
+            </h2>
+            <p className="text-sm text-gray-500 mt-1">
+              Selecione a peça e marque o custo da peça e o custo da embalagem
+              separadamente. Os cálculos de lucro, ROI e investimento se
+              atualizam automaticamente em todo o sistema.
+            </p>
+          </div>
+          {semCusto > 0 && (
+            <span className="text-xs px-2 py-1 bg-orange-50 text-orange-700 rounded-full whitespace-nowrap">
+              {semCusto} sem custo
+            </span>
+          )}
+        </div>
+        <div className="relative">
+          <FiSearch
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            size={18}
+          />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Buscar por nome, categoria ou ID..."
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#967965]"
+          />
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="bg-white rounded-xl border border-gray-100 p-10 text-center">
+          <FiPackage size={28} className="mx-auto text-gray-400 mb-3" />
+          <p className="text-sm text-gray-500">
+            {search
+              ? "Nenhum produto encontrado com esse termo."
+              : "Nenhum produto cadastrado ainda."}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+          {filtered.map((p) => (
+            <CustosRow key={p._id || p.dalia_id} product={p} onSaved={onSaved} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+const CustosRow = ({ product, onSaved }) => {
+  const [custo, setCusto] = useState(
+    product.custo != null ? String(product.custo) : "",
+  );
+  const [embalagem, setEmbalagem] = useState(
+    product.custoEmbalagem != null ? String(product.custoEmbalagem) : "",
+  );
+  const [saving, setSaving] = useState(false);
+  const [savedFlash, setSavedFlash] = useState(false);
+
+  useEffect(() => {
+    setCusto(product.custo != null ? String(product.custo) : "");
+    setEmbalagem(
+      product.custoEmbalagem != null ? String(product.custoEmbalagem) : "",
+    );
+  }, [product.custo, product.custoEmbalagem]);
+
+  const dirty =
+    String(product.custo ?? "") !== custo ||
+    String(product.custoEmbalagem ?? "") !== embalagem;
+
+  const custoTotal = (Number(custo) || 0) + (Number(embalagem) || 0);
+  const price = Number(product.price) || 0;
+  const lucroUn = price - custoTotal;
+  const margem = price > 0 ? (lucroUn / price) * 100 : 0;
+  const roi = custoTotal > 0 ? (lucroUn / custoTotal) * 100 : 0;
+  const stock = Math.max(0, Number(product.stock) || 0);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const payload = new FormData();
+      payload.append("custo", custo === "" ? "0" : custo);
+      payload.append("custoEmbalagem", embalagem === "" ? "0" : embalagem);
+      await api.put(`/products/${product.dalia_id}`, payload, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      setSavedFlash(true);
+      setTimeout(() => setSavedFlash(false), 1800);
+      onSaved?.();
+    } catch (err) {
+      alert(err?.response?.data?.message || "Erro ao salvar custo");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const roiClass =
+    roi >= 100
+      ? "text-emerald-700"
+      : roi >= 50
+        ? "text-amber-600"
+        : "text-red-600";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 4 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-xl border border-gray-100 shadow-sm p-4"
+    >
+      <div className="flex items-start gap-3 mb-3">
+        {product.images?.[0] ? (
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            className="w-14 h-14 rounded-lg object-cover border border-gray-200 flex-shrink-0"
+          />
+        ) : (
+          <div className="w-14 h-14 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
+            <FiPackage size={20} className="text-gray-400" />
+          </div>
+        )}
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-gray-900 truncate">
+            {product.name}
+          </p>
+          <p className="text-[11px] text-gray-500 truncate">
+            {product.category}
+            {" · "}
+            {stock} em estoque
+            {price > 0 && ` · Vende por ${formatBRL(price)}`}
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">
+            Custo da peça (R$)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={custo}
+            onChange={(e) => setCusto(e.target.value)}
+            placeholder="0,00"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#967965]"
+          />
+        </div>
+        <div>
+          <label className="block text-[10px] uppercase tracking-wider text-gray-500 mb-1">
+            Custo embalagem (R$)
+          </label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            value={embalagem}
+            onChange={(e) => setEmbalagem(e.target.value)}
+            placeholder="0,00"
+            className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#967965]"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t border-gray-100">
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-gray-500">
+            Total/un
+          </p>
+          <p className="text-xs font-bold text-gray-900 mt-0.5">
+            {formatBRL(custoTotal)}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-gray-500">
+            Lucro/un
+          </p>
+          <p
+            className={`text-xs font-bold mt-0.5 ${lucroUn >= 0 ? "text-emerald-700" : "text-red-600"}`}
+          >
+            {formatBRL(lucroUn)}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-gray-500">
+            Margem
+          </p>
+          <p className="text-xs font-bold text-gray-900 mt-0.5">
+            {formatPct(margem)}
+          </p>
+        </div>
+        <div>
+          <p className="text-[10px] uppercase tracking-wider text-gray-500">
+            ROI
+          </p>
+          <p className={`text-xs font-bold mt-0.5 ${roiClass}`}>
+            {formatPct(roi)}
+          </p>
+        </div>
+      </div>
+
+      <div className="mt-3 flex items-center justify-between gap-2">
+        <span
+          className={`text-xs transition-opacity ${savedFlash ? "opacity-100 text-emerald-700" : "opacity-0"}`}
+        >
+          ✓ Salvo
+        </span>
+        <button
+          onClick={handleSave}
+          disabled={!dirty || saving}
+          className={`px-4 py-2 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors ${
+            !dirty || saving
+              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+              : "bg-[#967965] text-white hover:bg-[#7A5F4F]"
+          }`}
+        >
+          {saving ? (
+            <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <FiSave size={13} />
+          )}
+          Salvar
+        </button>
+      </div>
+    </motion.div>
   );
 };
 

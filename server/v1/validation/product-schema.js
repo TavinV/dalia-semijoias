@@ -49,6 +49,15 @@ const productSchema = Joi.object({
             "number.min": "O custo não pode ser negativo"
         }),
 
+    custoEmbalagem: Joi.number()
+        .precision(2)
+        .min(0)
+        .optional()
+        .messages({
+            "number.base": "O custo da embalagem deve ser um número",
+            "number.min": "O custo da embalagem não pode ser negativo"
+        }),
+
     images: Joi.array()
         .items(Joi.string())
         .min(1)
