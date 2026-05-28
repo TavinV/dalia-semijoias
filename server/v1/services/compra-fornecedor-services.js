@@ -193,7 +193,7 @@ class CompraFornecedorServices {
             pipeline.push(
                 {
                     $lookup: {
-                        from: "fornecedores",
+                        from: Fornecedor.collection.name,
                         localField: "fornecedorId",
                         foreignField: "_id",
                         as: "_fornecedor",
@@ -202,7 +202,7 @@ class CompraFornecedorServices {
                 { $unwind: "$_fornecedor" },
                 {
                     $lookup: {
-                        from: "itensCompra",
+                        from: ItemCompra.collection.name,
                         localField: "_id",
                         foreignField: "compraId",
                         as: "_itens",

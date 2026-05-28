@@ -146,7 +146,7 @@ class FornecedorServices {
                 ItemCompra.aggregate([
                     {
                         $lookup: {
-                            from: "comprasFornecedor",
+                            from: CompraFornecedor.collection.name,
                             localField: "compraId",
                             foreignField: "_id",
                             as: "_compra",
