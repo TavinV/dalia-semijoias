@@ -8,8 +8,9 @@ import Footer from "../components/layout/Footer.jsx";
 import CatalogSkeleton from "../components/skeletons/CatalogSkeleton.jsx";
 
 import { useProducts } from "../hooks/useProducts.jsx";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import SkeletonCard from "../components/skeletons/SkeletonCard.jsx";
+import ProductCard from "../components/ui/ProductCard.jsx";
 import api from "../api/axios.js";
 
 const formatBRL = (v) =>
@@ -101,7 +102,14 @@ const TopMesPublico = ({ products }) => {
 function Catalog() {
   const { products, loading, error } = useProducts();
   const navigate = useNavigate();
-  const [selectedCategory, setSelectedCategory] = useState("todos");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedCategory = searchParams.get("cat") || "todos";
+  const setSelectedCategory = (cat) => {
+    const next = new URLSearchParams(searchParams);
+    if (cat === "todos") next.delete("cat");
+    else next.set("cat", cat);
+    setSearchParams(next, { replace: true });
+  };
   const [selectedMaterial, setSelectedMaterial] = useState("todos");
   const [selectedGender, setSelectedGender] = useState("todos");
   const [maxPrice, setMaxPrice] = useState(null);
@@ -200,6 +208,35 @@ function Catalog() {
     selectedGender !== "todos" ||
     (maxPrice !== null && maxPrice < priceCap);
 
+  // 3 categorias com mais produtos cadastrados (showcase)
+  const showcaseCategorias = useMemo(() => {
+    const counts = {};
+    for (const p of products || []) {
+      const c = p.category;
+      if (!c) continue;
+      counts[c] = (counts[c] || 0) + 1;
+    }
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3)
+      .map(([cat]) => cat);
+  }, [products]);
+
+  // Top 3 mais caros por categoria
+  const topPorCategoria = useMemo(() => {
+    const map = {};
+    for (const cat of showcaseCategorias) {
+      map[cat] = (products || [])
+        .filter((p) => p.category === cat)
+        .sort((a, b) => (Number(b.price) || 0) - (Number(a.price) || 0))
+        .slice(0, 3);
+    }
+    return map;
+  }, [products, showcaseCategorias]);
+
+  const labelDaCategoria = (cat) =>
+    categories.find((c) => c.id === cat)?.label || cat;
+
   return (
     <>
       <Header />
@@ -220,36 +257,27 @@ function Catalog() {
             </p>
           </div>
 
-          {/* Filtros — categoria + material + gênero + preço */}
+          {/* Filtros — material + gênero + preço (categoria fica no SearchBar) */}
           <div className="mt-10 sm:mt-12 space-y-6">
-            {/* Categorias */}
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-gray-400 text-center mb-3 font-fancy">
-                Categoria
-              </p>
-              <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
-                {categories.map((category) => (
+            {/* Indicador de categoria ativa (se houver) */}
+            {selectedCategory !== "todos" && (
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
+                  Categoria selecionada:
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#967965] text-white rounded-full text-sm font-fancy">
+                  {categories.find((c) => c.id === selectedCategory)?.label ||
+                    selectedCategory}
                   <button
-                    key={category.id}
-                    onClick={() => setSelectedCategory(category.id)}
-                    disabled={loading}
-                    className={`
-                      px-4 sm:px-5 py-2 sm:py-2.5
-                      text-sm sm:text-base font-fancy
-                      transition-all duration-300 ease-in-out
-                      ${
-                        selectedCategory === category.id
-                          ? "bg-[#967965] text-white shadow-md hover:bg-[#7a6150]"
-                          : "bg-transparent text-gray-600 hover:text-[#967965] hover:bg-[#967965]/5"
-                      }
-                      ${loading ? "opacity-50 cursor-not-allowed" : ""}
-                    `}
+                    onClick={() => setSelectedCategory("todos")}
+                    className="hover:text-white/70 transition-colors"
+                    aria-label="Remover filtro de categoria"
                   >
-                    {category.label}
+                    ×
                   </button>
-                ))}
+                </span>
               </div>
-            </div>
+            )}
 
             {/* Material + Gênero lado a lado */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -347,6 +375,46 @@ function Catalog() {
             )}
           </div>
         </div>
+
+        {/* 3 linhas — categorias em destaque com top 3 peças cada */}
+        {!loading && showcaseCategorias.length > 0 && (
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 space-y-10 sm:space-y-14">
+            <div className="text-center">
+              <h2 className="font-fancy text-2xl sm:text-3xl md:text-4xl text-gray-900 tracking-tight">
+                Explore por categoria
+              </h2>
+              <p className="font-fancy text-sm sm:text-base text-gray-500 mt-2">
+                As 3 mais procuradas, com as peças em destaque de cada
+              </p>
+            </div>
+
+            {showcaseCategorias.map((cat) => (
+              <div key={cat}>
+                <button
+                  onClick={() => setSelectedCategory(cat)}
+                  className="w-full group flex items-end justify-between gap-3 pb-3 border-b border-[#967965]/20 hover:border-[#967965] transition-colors text-left"
+                >
+                  <h3 className="font-fancy text-2xl sm:text-3xl text-gray-900 group-hover:text-[#967965] transition-colors">
+                    {labelDaCategoria(cat)}
+                  </h3>
+                  <span className="text-xs sm:text-sm font-fancy uppercase tracking-[0.2em] text-[#967965] group-hover:translate-x-1 transition-transform pb-1">
+                    Ver todos →
+                  </span>
+                </button>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-5">
+                  {(topPorCategoria[cat] || []).map((p) => (
+                    <ProductCard
+                      key={p.dalia_id}
+                      id={p.dalia_id}
+                      product={p}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Grid de produtos com skeleton loading */}
         <div className="px-4 sm:px-6 lg:px-8 pb-0">
