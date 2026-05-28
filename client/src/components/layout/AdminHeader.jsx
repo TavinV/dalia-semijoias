@@ -11,6 +11,9 @@ import {
   FiHome,
   FiSettings,
   FiUser,
+  FiUsers,
+  FiAlertCircle,
+  FiBriefcase,
 } from "react-icons/fi";
 import Logo from "../ui/Logo";
 
@@ -58,6 +61,24 @@ const AdminHeader = () => {
       to: "/create-product",
       label: "Cadastrar Produto",
       icon: FiPlusCircle,
+      exact: false,
+    },
+    {
+      to: "/clients",
+      label: "Clientes",
+      icon: FiUsers,
+      exact: false,
+    },
+    {
+      to: "/pendencies",
+      label: "Pendências",
+      icon: FiAlertCircle,
+      exact: false,
+    },
+    {
+      to: "/admin/fornecedores",
+      label: "Fornecedores",
+      icon: FiBriefcase,
       exact: false,
     },
   ];
