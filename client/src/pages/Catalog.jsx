@@ -83,9 +83,6 @@ const TopMesPublico = ({ products }) => {
                 <p className="text-sm font-medium text-gray-900 line-clamp-2">
                   {t.name}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {t.qty} {t.qty === 1 ? "vendida" : "vendidas"}
-                </p>
               </div>
             </div>
           );
