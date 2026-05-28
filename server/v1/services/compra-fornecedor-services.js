@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import CompraFornecedor from "../models/compra-fornecedor-model.js";
 import ItemCompra from "../models/item-compra-model.js";
 import Fornecedor from "../models/fornecedor-model.js";
@@ -7,6 +8,7 @@ import {
     itemCompraJoi,
     updateItemCompraSchema,
 } from "../validation/compra-fornecedor-schema.js";
+import { round2, computeRoi } from "../utils/numeric.js";
 
 import {
     AppError,
@@ -170,6 +172,177 @@ class CompraFornecedorServices {
             return await ItemCompra.find({ compraId }).sort({ criadoEm: 1 });
         } catch (error) {
             throw new AppError("Erro ao buscar itens: " + error.message);
+        }
+    }
+
+    // ============ VIEW: vw_compras_por_mes ============
+    // Agrupa por (mês-ano, fornecedor) e calcula totais financeiros.
+    // Filtro opcional por fornecedorId.
+    static async comprasPorMes({ fornecedorId } = {}) {
+        try {
+            const pipeline = [];
+
+            if (fornecedorId) {
+                pipeline.push({
+                    $match: {
+                        fornecedorId: new mongoose.Types.ObjectId(fornecedorId),
+                    },
+                });
+            }
+
+            pipeline.push(
+                {
+                    $lookup: {
+                        from: "fornecedores",
+                        localField: "fornecedorId",
+                        foreignField: "_id",
+                        as: "_fornecedor",
+                    },
+                },
+                { $unwind: "$_fornecedor" },
+                {
+                    $lookup: {
+                        from: "itensCompra",
+                        localField: "_id",
+                        foreignField: "compraId",
+                        as: "_itens",
+                    },
+                },
+                {
+                    $addFields: {
+                        _mesAno: {
+                            $dateToString: {
+                                format: "%Y-%m",
+                                date: "$dataCompra",
+                            },
+                        },
+                        _totalPecas: { $sum: "$_itens.quantidade" },
+                        _faturamento: {
+                            $sum: {
+                                $map: {
+                                    input: "$_itens",
+                                    as: "it",
+                                    in: {
+                                        $multiply: [
+                                            "$$it.precoVenda",
+                                            "$$it.quantidade",
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                        _custoTotal: {
+                            $sum: {
+                                $map: {
+                                    input: "$_itens",
+                                    as: "it",
+                                    in: {
+                                        $multiply: [
+                                            {
+                                                $add: [
+                                                    "$$it.custoUnitario",
+                                                    "$$it.custoEmbalagem",
+                                                ],
+                                            },
+                                            "$$it.quantidade",
+                                        ],
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+                {
+                    $group: {
+                        _id: {
+                            mesAno: "$_mesAno",
+                            fornecedorId: "$fornecedorId",
+                            fornecedorNome: "$_fornecedor.nome",
+                        },
+                        totalInvestido: { $sum: "$valorTotalPago" },
+                        totalPecas: { $sum: "$_totalPecas" },
+                        faturamentoPotencial: { $sum: "$_faturamento" },
+                        lucroPotencial: {
+                            $sum: { $subtract: ["$_faturamento", "$_custoTotal"] },
+                        },
+                        custoSomaTotal: { $sum: "$_custoTotal" },
+                    },
+                },
+                { $sort: { "_id.mesAno": -1, "_id.fornecedorNome": 1 } }
+            );
+
+            const rows = await CompraFornecedor.aggregate(pipeline);
+
+            return rows.map((r) => ({
+                mesAno: r._id.mesAno,
+                fornecedorId: r._id.fornecedorId,
+                fornecedorNome: r._id.fornecedorNome,
+                totalInvestido: round2(r.totalInvestido || 0),
+                totalPecas: r.totalPecas || 0,
+                faturamentoPotencial: round2(r.faturamentoPotencial || 0),
+                lucroPotencial: round2(r.lucroPotencial || 0),
+                roiMedio: computeRoi(r.lucroPotencial, r.custoSomaTotal),
+            }));
+        } catch (error) {
+            throw new AppError(
+                "Erro ao agregar compras por mês: " + error.message
+            );
+        }
+    }
+
+    // ============ VIEW: vw_estoque_por_categoria ============
+    // Soma itens por categoria, com totais financeiros.
+    static async estoquePorCategoria() {
+        try {
+            const rows = await ItemCompra.aggregate([
+                {
+                    $addFields: {
+                        _custoTotalUnit: {
+                            $add: ["$custoUnitario", "$custoEmbalagem"],
+                        },
+                        _faturamento: {
+                            $multiply: ["$precoVenda", "$quantidade"],
+                        },
+                    },
+                },
+                {
+                    $addFields: {
+                        _custoTotal: {
+                            $multiply: ["$_custoTotalUnit", "$quantidade"],
+                        },
+                    },
+                },
+                {
+                    $addFields: {
+                        _lucro: {
+                            $subtract: ["$_faturamento", "$_custoTotal"],
+                        },
+                    },
+                },
+                {
+                    $group: {
+                        _id: "$categoria",
+                        totalUnidades: { $sum: "$quantidade" },
+                        custoTotal: { $sum: "$_custoTotal" },
+                        faturamentoPotencial: { $sum: "$_faturamento" },
+                        lucroPotencial: { $sum: "$_lucro" },
+                    },
+                },
+                { $sort: { _id: 1 } },
+            ]);
+
+            return rows.map((r) => ({
+                categoria: r._id,
+                totalUnidades: r.totalUnidades || 0,
+                custoTotal: round2(r.custoTotal || 0),
+                faturamentoPotencial: round2(r.faturamentoPotencial || 0),
+                lucroPotencial: round2(r.lucroPotencial || 0),
+                roiMedio: computeRoi(r.lucroPotencial, r.custoTotal),
+            }));
+        } catch (error) {
+            throw new AppError(
+                "Erro ao agregar estoque por categoria: " + error.message
+            );
         }
     }
 }

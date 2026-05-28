@@ -1,9 +1,11 @@
+import mongoose from "mongoose";
 import Fornecedor from "../models/fornecedor-model.js";
 import CompraFornecedor from "../models/compra-fornecedor-model.js";
 import ItemCompra from "../models/item-compra-model.js";
 import fornecedorSchema, {
     updateFornecedorSchema,
 } from "../validation/fornecedor-schema.js";
+import { round2, computeRoi } from "../utils/numeric.js";
 
 import {
     AppError,
@@ -115,6 +117,99 @@ class FornecedorServices {
         } catch (error) {
             if (error instanceof AppError) throw error;
             throw new AppError("Erro ao buscar fornecedor: " + error.message);
+        }
+    }
+
+    // ============ VIEW: vw_resumo_fornecedor ============
+    // Agrupa todas as compras e itens de um fornecedor em métricas únicas.
+    // roiMedio é ponderado pelo custo total (lucroSum / custoSum * 100),
+    // que é o ROI agregado financeiramente correto.
+    static async resumoPorFornecedor(id) {
+        try {
+            const fornecedor = await Fornecedor.findById(id);
+            if (!fornecedor) throw new NotFoundError("Fornecedor não encontrado");
+
+            const objectId = new mongoose.Types.ObjectId(id);
+
+            const [comprasAgg, itensAgg] = await Promise.all([
+                CompraFornecedor.aggregate([
+                    { $match: { fornecedorId: objectId } },
+                    {
+                        $group: {
+                            _id: "$fornecedorId",
+                            totalCompras: { $sum: 1 },
+                            totalInvestido: { $sum: "$valorTotalPago" },
+                            ultimaCompra: { $max: "$dataCompra" },
+                        },
+                    },
+                ]),
+                ItemCompra.aggregate([
+                    {
+                        $lookup: {
+                            from: "comprasFornecedor",
+                            localField: "compraId",
+                            foreignField: "_id",
+                            as: "_compra",
+                        },
+                    },
+                    { $unwind: "$_compra" },
+                    { $match: { "_compra.fornecedorId": objectId } },
+                    {
+                        $addFields: {
+                            _custoTotal: {
+                                $multiply: [
+                                    {
+                                        $add: [
+                                            "$custoUnitario",
+                                            "$custoEmbalagem",
+                                        ],
+                                    },
+                                    "$quantidade",
+                                ],
+                            },
+                            _faturamento: {
+                                $multiply: ["$precoVenda", "$quantidade"],
+                            },
+                        },
+                    },
+                    {
+                        $addFields: {
+                            _lucro: {
+                                $subtract: ["$_faturamento", "$_custoTotal"],
+                            },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            totalPecas: { $sum: "$quantidade" },
+                            faturamentoPotencial: { $sum: "$_faturamento" },
+                            lucroPotencial: { $sum: "$_lucro" },
+                            custoSomaTotal: { $sum: "$_custoTotal" },
+                        },
+                    },
+                ]),
+            ]);
+
+            const c = comprasAgg[0] || {};
+            const i = itensAgg[0] || {};
+
+            return {
+                fornecedorId: id,
+                fornecedorNome: fornecedor.nome,
+                totalCompras: c.totalCompras || 0,
+                totalInvestido: round2(c.totalInvestido || 0),
+                totalPecas: i.totalPecas || 0,
+                faturamentoPotencial: round2(i.faturamentoPotencial || 0),
+                lucroPotencial: round2(i.lucroPotencial || 0),
+                roiMedio: computeRoi(i.lucroPotencial, i.custoSomaTotal),
+                ultimaCompra: c.ultimaCompra || null,
+            };
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+            throw new AppError(
+                "Erro ao gerar resumo do fornecedor: " + error.message
+            );
         }
     }
 }

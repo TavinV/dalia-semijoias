@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { round2 } from "../utils/numeric.js";
 
 export const CATEGORIAS_FORNECEDOR = [
     "anel",
@@ -10,12 +11,6 @@ export const CATEGORIAS_FORNECEDOR = [
     "pulseira_m",
     "corrente",
 ];
-
-const round2 = (v) => {
-    const n = Number(v);
-    if (!Number.isFinite(n)) return 0;
-    return Math.round((n + Number.EPSILON) * 100) / 100;
-};
 
 const itemCompraSchema = new mongoose.Schema(
     {
