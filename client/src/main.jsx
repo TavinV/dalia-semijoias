@@ -2,7 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { CartProvider } from './context/CartContext.jsx';
-import { useLenis } from './hooks/useLenis.jsx';
 
 import './index.css'
 
@@ -70,15 +69,10 @@ const router = createBrowserRouter([
   }
 ]);
 
-function App() {
-  useLenis();
-  return <RouterProvider router={router} />;
-}
-
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <CartProvider>
-      <App />
+      <RouterProvider router={router} />
     </CartProvider>
   </StrictMode>,
 )
