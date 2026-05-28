@@ -15,6 +15,7 @@ import {
 import AdminHeader from "../components/layout/AdminHeader";
 import { useAuth } from "../hooks/useAuth";
 import { useFornecedores } from "../hooks/useFornecedores";
+import { useProducts } from "../hooks/useProducts";
 import api from "../api/axios";
 import CreateFornecedorModal from "../components/modules/CreateFornecedorModal";
 import CreateCompraFornecedorModal from "../components/modules/CreateCompraFornecedorModal";
@@ -226,6 +227,7 @@ const Fornecedores = () => {
   const navigate = useNavigate();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const { fornecedores, loading: lLoading, refetch } = useFornecedores();
+  const { products } = useProducts();
   const { resumos, loading: rLoading } = useResumosBatch(fornecedores);
 
   const [modalNovoOpen, setModalNovoOpen] = useState(false);
@@ -235,19 +237,26 @@ const Fornecedores = () => {
     if (!authLoading && isAuthenticated === false) navigate("/login");
   }, [isAuthenticated, authLoading, navigate]);
 
+  // Totais agora são baseados no ESTOQUE ATUAL (products):
+  //  - investido = Σ custo × stock (quanto está parado em estoque agora)
+  //  - faturamento potencial = Σ price × stock (quanto dá pra faturar com o que tem)
+  //  - lucro potencial = faturamento - investido
+  //  - ROI geral = lucro / investido × 100
+  // Reativo: muda automaticamente quando produto/estoque é editado.
   const totais = useMemo(() => {
     let inv = 0;
     let fat = 0;
-    for (const f of fornecedores) {
-      const r = resumos[f._id];
-      if (!r) continue;
-      inv += Number(r.totalInvestido) || 0;
-      fat += Number(r.faturamentoPotencial) || 0;
+    for (const p of products || []) {
+      const stock = Math.max(0, Number(p.stock) || 0);
+      const price = Number(p.price) || 0;
+      const custo = Number(p.custo) || 0;
+      inv += custo * stock;
+      fat += price * stock;
     }
     const lucro = fat - inv;
     const roi = inv > 0 ? (lucro / inv) * 100 : 0;
     return { totalInvestido: inv, faturamento: fat, lucro, roi };
-  }, [fornecedores, resumos]);
+  }, [products]);
 
   const ordenados = useMemo(() => {
     const arr = [...fornecedores];
@@ -294,7 +303,7 @@ const Fornecedores = () => {
               Fornecedores
             </h1>
             <p className="text-gray-500 font-light">
-              Acompanhe investimento, faturamento potencial e ROI por fornecedor
+              Acompanhe investimento, faturamento potencial e ROI — atrelado ao estoque atual
             </p>
           </div>
 

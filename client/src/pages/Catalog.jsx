@@ -1,5 +1,5 @@
 // Catalog.jsx
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../components/layout/Header.jsx";
 import Banner from "../components/layout/Banner.jsx";
 import Main from "../components/layout/Main.jsx";
@@ -10,6 +10,90 @@ import CatalogSkeleton from "../components/skeletons/CatalogSkeleton.jsx";
 import { useProducts } from "../hooks/useProducts.jsx";
 import { useNavigate } from "react-router-dom";
 import SkeletonCard from "../components/skeletons/SkeletonCard.jsx";
+import api from "../api/axios.js";
+
+// Top 5 peças mais vendidas no mês (público)
+const TopMesPublico = ({ products }) => {
+  const [topItems, setTopItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .get("/sales/top-mes", { params: { limit: 5 } })
+      .then((r) => {
+        if (!cancelled) setTopItems(r.data.data || []);
+      })
+      .catch(() => {
+        if (!cancelled) setTopItems([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading || topItems.length === 0) return null;
+
+  // Tenta achar o product pelo nome pra mostrar imagem
+  const productByName = {};
+  for (const p of products || []) {
+    if (p.name) productByName[p.name.toLowerCase().trim()] = p;
+  }
+
+  return (
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+      <div className="text-center mb-8">
+        <h2 className="font-fancy text-2xl sm:text-3xl md:text-4xl text-gray-900 tracking-tight">
+          Mais vendidos do mês
+        </h2>
+        <p className="font-fancy text-sm sm:text-base text-gray-500 mt-2">
+          As favoritas das nossas clientes
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+        {topItems.map((t, idx) => {
+          const matched = productByName[(t.name || "").toLowerCase().trim()];
+          const img = matched?.images?.[0];
+          return (
+            <div
+              key={`${t.name}-${idx}`}
+              className="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+            >
+              <span className="absolute top-2 left-2 z-10 w-7 h-7 rounded-full bg-[#967965] text-white text-xs font-bold flex items-center justify-center shadow">
+                {idx + 1}
+              </span>
+              <div className="aspect-square bg-gray-100">
+                {img ? (
+                  <img
+                    src={img}
+                    alt={t.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-gray-300 text-3xl font-fancy">
+                    ♡
+                  </div>
+                )}
+              </div>
+              <div className="p-3 text-center">
+                <p className="text-sm font-medium text-gray-900 line-clamp-2">
+                  {t.name}
+                </p>
+                <p className="text-xs text-gray-500 mt-1">
+                  {t.qty} {t.qty === 1 ? "vendida" : "vendidas"}
+                </p>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 function Catalog() {
   const { products, loading, error } = useProducts();
@@ -49,6 +133,9 @@ function Catalog() {
       <Banner />
 
       <Main>
+        {/* Top 5 do mês (público) */}
+        <TopMesPublico products={products} />
+
         {/* Cabeçalho do catálogo */}
         <div className="w-full max-w-screen mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
           <div className="text-center space-y-4">

@@ -16,6 +16,7 @@ import ClientDetail from './pages/ClientDetail.jsx';
 import Pendencies from './pages/Pendencies.jsx';
 import Fornecedores from './pages/Fornecedores.jsx';
 import FornecedorDetail from './pages/FornecedorDetail.jsx';
+import Saidas from './pages/Saidas.jsx';
 
 const router = createBrowserRouter([
   {
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
   {
     path: '/admin/fornecedores/:id',
     element: <FornecedorDetail />
+  },
+  {
+    path: '/admin/saidas',
+    element: <Saidas />
   }
 ]);
 

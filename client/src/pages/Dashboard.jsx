@@ -667,16 +667,10 @@ const Dashboard = () => {
 
           {/* Ações do Header */}
           <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-white rounded-lg transition-colors relative">
-              <FiBell size={20} className="text-gray-600" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
-            <button className="p-2 hover:bg-white rounded-lg transition-colors">
-              <FiSettings size={20} className="text-gray-600" />
-            </button>
             <button
               onClick={logout}
               className="p-2 hover:bg-white rounded-lg transition-colors"
+              title="Sair"
             >
               <FiLogOut size={20} className="text-gray-600" />
             </button>
@@ -714,12 +708,6 @@ const Dashboard = () => {
               label="Novo Produto"
               onClick={() => navigate("/create-product")}
               color="emerald"
-            />
-            <QuickAction icon={FiFilter} label="Filtrar" onClick={() => {}} />
-            <QuickAction
-              icon={FiDownload}
-              label="Exportar"
-              onClick={() => {}}
             />
           </div>
         </div>

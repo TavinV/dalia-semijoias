@@ -76,8 +76,8 @@ const AdminHeader = () => {
       exact: false,
     },
     {
-      to: "/admin/fornecedores",
-      label: "Relatórios",
+      to: "/admin/saidas",
+      label: "Saídas",
       icon: FiBriefcase,
       exact: false,
     },
