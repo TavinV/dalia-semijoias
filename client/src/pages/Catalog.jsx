@@ -25,8 +25,6 @@ const formatBRL = (v) =>
 const TopMesPublico = ({ products }) => {
   const [topItems, setTopItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { addItem } = useCart();
-  const [addedId, setAddedId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -54,20 +52,6 @@ const TopMesPublico = ({ products }) => {
     if (p.name) productByName[p.name.toLowerCase().trim()] = p;
   }
 
-  const handleAdd = (matched) => {
-    if (!matched) return;
-    addItem({
-      id: matched.dalia_id,
-      name: matched.name,
-      material: matched.material,
-      price: matched.price,
-      stock: matched.stock,
-      image: matched.images?.[0],
-    });
-    setAddedId(matched.dalia_id);
-    setTimeout(() => setAddedId(null), 1500);
-  };
-
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <div className="text-center mb-8">
@@ -79,62 +63,16 @@ const TopMesPublico = ({ products }) => {
         </p>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8">
         {topItems.map((t, idx) => {
           const matched = productByName[(t.name || "").toLowerCase().trim()];
-          const img = matched?.images?.[0];
-          const price = matched?.price;
-          const justAdded = matched && addedId === matched.dalia_id;
+          if (!matched) return null;
           return (
-            <div
-              key={`${t.name}-${idx}`}
-              className="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex flex-col"
-            >
-              <span className="absolute top-2 left-2 z-10 w-7 h-7 rounded-full bg-[#967965] text-white text-xs font-bold flex items-center justify-center shadow">
+            <div key={`${t.name}-${idx}`} className="relative">
+              <span className="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-[#967965] text-white text-sm font-bold flex items-center justify-center shadow-lg">
                 {idx + 1}
               </span>
-              <div className="aspect-square bg-gray-100">
-                {img ? (
-                  <img
-                    src={img}
-                    alt={t.name}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-gray-300 text-3xl font-fancy">
-                    ♡
-                  </div>
-                )}
-              </div>
-              <div className="p-3 text-center flex-1 flex flex-col justify-between gap-2">
-                <p className="text-sm font-medium text-gray-900 line-clamp-2 font-fancy">
-                  {t.name}
-                </p>
-                {price != null && (
-                  <p className="font-fancy text-base sm:text-lg font-bold text-gray-900">
-                    R$ {Number(price).toFixed(2)}
-                  </p>
-                )}
-                {matched && (
-                  <button
-                    onClick={() => handleAdd(matched)}
-                    disabled={justAdded || (matched.stock || 0) < 1}
-                    className={`w-full px-2 py-1.5 text-[11px] sm:text-xs font-fancy uppercase tracking-wider rounded-md transition-all ${
-                      justAdded
-                        ? "bg-emerald-600 text-white"
-                        : (matched.stock || 0) < 1
-                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                          : "bg-[#967965] text-white hover:bg-[#7A5F4F]"
-                    }`}
-                  >
-                    {justAdded
-                      ? "✓ Adicionado"
-                      : (matched.stock || 0) < 1
-                        ? "Esgotado"
-                        : "+ Adicionar"}
-                  </button>
-                )}
-              </div>
+              <ProductCard id={matched.dalia_id} product={matched} />
             </div>
           );
         })}
@@ -376,7 +314,10 @@ function Catalog() {
         <TopMesPublico products={products} />
 
         {/* Cabeçalho do catálogo */}
-        <div className="w-full max-w-screen mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <div
+          id="nosso-catalogo"
+          className="w-full max-w-screen mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 scroll-mt-24"
+        >
           <div className="text-center space-y-4">
             <h1 className="font-fancy text-3xl sm:text-4xl md:text-5xl text-gray-900 tracking-tight">
               Nosso catálogo
