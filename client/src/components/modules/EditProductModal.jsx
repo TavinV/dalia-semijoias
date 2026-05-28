@@ -19,6 +19,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
     name: "",
     description: "",
     price: "",
+    custo: "",
     category: "",
     material: "",
     gender: "",
@@ -61,6 +62,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
         name: product.name || "",
         description: product.description || "",
         price: product.price || "",
+        custo: product.custo ?? "",
         category: product.category || "",
         material: product.material || "",
         gender: product.gender || "",
@@ -290,7 +292,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Nome e Preço */}
+                  {/* Nome, Preço, Custo */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -306,20 +308,37 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
                         required
                       />
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Preço (R$) *
-                      </label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
-                        placeholder="0,00"
-                        required
-                      />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Preço (R$) *
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          name="price"
+                          value={formData.price}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
+                          placeholder="0,00"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                          Custo (R$)
+                        </label>
+                        <input
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          name="custo"
+                          value={formData.custo}
+                          onChange={handleChange}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
+                          placeholder="0,00"
+                        />
+                      </div>
                     </div>
                   </div>
 

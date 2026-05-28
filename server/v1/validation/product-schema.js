@@ -22,12 +22,11 @@ const productSchema = Joi.object({
         }),
 
     description: Joi.string()
-        .min(5)
-        .max(500)
+        .min(1)
+        .max(1024)
         .required()
         .messages({
             "string.empty": "A descrição é obrigatória",
-            "string.min": "A descrição deve ter pelo menos {#limit} caracteres",
             "string.max": "A descrição não pode passar de {#limit} caracteres"
         }),
 
@@ -39,6 +38,15 @@ const productSchema = Joi.object({
             "number.base": "O preço deve ser um número",
             "number.positive": "O preço deve ser maior que 0",
             "any.required": "O preço é obrigatório"
+        }),
+
+    custo: Joi.number()
+        .precision(2)
+        .min(0)
+        .optional()
+        .messages({
+            "number.base": "O custo deve ser um número",
+            "number.min": "O custo não pode ser negativo"
         }),
 
     images: Joi.array()
