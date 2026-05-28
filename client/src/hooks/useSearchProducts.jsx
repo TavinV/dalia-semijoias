@@ -1,25 +1,22 @@
-import { useEffect, useState } from "react";
-import api from "../api/axios";
+import { useEffect, useState, useMemo } from "react";
+import { useProducts } from "./useProducts";
+import { matchesQuery } from "../utils/searchMatch";
 
+// Busca multi-palavra do lado do cliente, com sinônimos
+// (ex.: "brinco ouro" → brincos com material Ouro 18k)
 export function useSearchProducts(query) {
-    const [results, setResults] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const { products, loading } = useProducts();
+    const [debounced, setDebounced] = useState(query);
 
     useEffect(() => {
-        if (!query) {
-            setResults([]);
-            return;
-        }
-
-        const delay = setTimeout(() => {
-            setLoading(true);
-            api.get(`/products?name=${encodeURIComponent(query)}`)
-                .then(res => setResults(res.data.data))
-                .finally(() => setLoading(false));
-        }, 400); // debounce 400ms
-
-        return () => clearTimeout(delay);
+        const t = setTimeout(() => setDebounced(query), 250);
+        return () => clearTimeout(t);
     }, [query]);
+
+    const results = useMemo(() => {
+        if (!debounced || !products) return [];
+        return products.filter((p) => matchesQuery(p, debounced));
+    }, [debounced, products]);
 
     return { results, loading };
 }

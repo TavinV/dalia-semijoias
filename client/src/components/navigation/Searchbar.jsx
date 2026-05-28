@@ -133,7 +133,23 @@ const SearchBar = ({ isOpen, onClose }) => {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Buscar produtos..."
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      const next = new URLSearchParams(searchParams);
+                      if (query.trim()) next.set("q", query.trim());
+                      else next.delete("q");
+                      setSearchParams(next, { replace: true });
+                      onClose();
+                      if (window.location.pathname !== "/") {
+                        navigate({
+                          pathname: "/",
+                          search: next.toString(),
+                        });
+                      }
+                    }
+                  }}
+                  placeholder="Buscar produtos... (ex: brinco ouro)"
                   className="flex-1 outline-none text-gray-700 placeholder-gray-400 text-base bg-transparent font-light"
                 />
                 {query && (

@@ -8,10 +8,12 @@ import Footer from "../components/layout/Footer.jsx";
 import CatalogSkeleton from "../components/skeletons/CatalogSkeleton.jsx";
 
 import { useProducts } from "../hooks/useProducts.jsx";
+import { useCart } from "../hooks/useCart.jsx";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import SkeletonCard from "../components/skeletons/SkeletonCard.jsx";
 import ProductCard from "../components/ui/ProductCard.jsx";
 import api from "../api/axios.js";
+import { matchesQuery } from "../utils/searchMatch.js";
 
 const formatBRL = (v) =>
   (Number(v) || 0).toLocaleString("pt-BR", {
@@ -23,6 +25,8 @@ const formatBRL = (v) =>
 const TopMesPublico = ({ products }) => {
   const [topItems, setTopItems] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { addItem } = useCart();
+  const [addedId, setAddedId] = useState(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -50,6 +54,20 @@ const TopMesPublico = ({ products }) => {
     if (p.name) productByName[p.name.toLowerCase().trim()] = p;
   }
 
+  const handleAdd = (matched) => {
+    if (!matched) return;
+    addItem({
+      id: matched.dalia_id,
+      name: matched.name,
+      material: matched.material,
+      price: matched.price,
+      stock: matched.stock,
+      image: matched.images?.[0],
+    });
+    setAddedId(matched.dalia_id);
+    setTimeout(() => setAddedId(null), 1500);
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
       <div className="text-center mb-8">
@@ -65,10 +83,12 @@ const TopMesPublico = ({ products }) => {
         {topItems.map((t, idx) => {
           const matched = productByName[(t.name || "").toLowerCase().trim()];
           const img = matched?.images?.[0];
+          const price = matched?.price;
+          const justAdded = matched && addedId === matched.dalia_id;
           return (
             <div
               key={`${t.name}-${idx}`}
-              className="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow"
+              className="relative bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow flex flex-col"
             >
               <span className="absolute top-2 left-2 z-10 w-7 h-7 rounded-full bg-[#967965] text-white text-xs font-bold flex items-center justify-center shadow">
                 {idx + 1}
@@ -86,10 +106,34 @@ const TopMesPublico = ({ products }) => {
                   </div>
                 )}
               </div>
-              <div className="p-3 text-center">
-                <p className="text-sm font-medium text-gray-900 line-clamp-2">
+              <div className="p-3 text-center flex-1 flex flex-col justify-between gap-2">
+                <p className="text-sm font-medium text-gray-900 line-clamp-2 font-fancy">
                   {t.name}
                 </p>
+                {price != null && (
+                  <p className="font-fancy text-base sm:text-lg font-bold text-gray-900">
+                    R$ {Number(price).toFixed(2)}
+                  </p>
+                )}
+                {matched && (
+                  <button
+                    onClick={() => handleAdd(matched)}
+                    disabled={justAdded || (matched.stock || 0) < 1}
+                    className={`w-full px-2 py-1.5 text-[11px] sm:text-xs font-fancy uppercase tracking-wider rounded-md transition-all ${
+                      justAdded
+                        ? "bg-emerald-600 text-white"
+                        : (matched.stock || 0) < 1
+                          ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                          : "bg-[#967965] text-white hover:bg-[#7A5F4F]"
+                    }`}
+                  >
+                    {justAdded
+                      ? "✓ Adicionado"
+                      : (matched.stock || 0) < 1
+                        ? "Esgotado"
+                        : "+ Adicionar"}
+                  </button>
+                )}
               </div>
             </div>
           );
@@ -110,6 +154,13 @@ function Catalog() {
     const next = new URLSearchParams(searchParams);
     if (cat === "todos") next.delete("cat");
     else next.set("cat", cat);
+    setSearchParams(next, { replace: true });
+  };
+  // Termo de pesquisa vindo do SearchBar (Enter → ?q=...)
+  const searchQuery = searchParams.get("q") || "";
+  const clearSearchQuery = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("q");
     setSearchParams(next, { replace: true });
   };
 
@@ -232,6 +283,7 @@ function Catalog() {
         if (!selectedGenders.includes(norm(p.gender))) return false;
       }
       if (maxPrice !== null && Number(p.price) > maxPrice) return false;
+      if (searchQuery && !matchesQuery(p, searchQuery)) return false;
       return true;
     });
   }, [
@@ -240,6 +292,7 @@ function Catalog() {
     selectedMaterials,
     selectedGenders,
     maxPrice,
+    searchQuery,
   ]);
 
   // Ordenação
@@ -271,6 +324,7 @@ function Catalog() {
     selectedGenders,
     maxPrice,
     sortBy,
+    searchQuery,
   ]);
   const safePage = Math.min(page, totalPages);
   const paginatedProducts = useMemo(() => {
@@ -550,22 +604,43 @@ function Catalog() {
             </div>
           )}
 
-          {/* Tag visual da categoria ativa (vinda do SearchBar via URL) */}
-          {selectedCategory !== "todos" && (
-            <div className="flex items-center justify-center gap-2 mt-6">
-              <span className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
-                Categoria:
-              </span>
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#967965] text-white rounded-full text-sm font-fancy">
-                {labelDaCategoria(selectedCategory)}
-                <button
-                  onClick={() => setSelectedCategory("todos")}
-                  className="hover:text-white/70 transition-colors"
-                  aria-label="Remover filtro de categoria"
-                >
-                  ×
-                </button>
-              </span>
+          {/* Tags visuais — pesquisa e categoria ativas (vindas do SearchBar via URL) */}
+          {(selectedCategory !== "todos" || searchQuery) && (
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
+              {searchQuery && (
+                <>
+                  <span className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
+                    Pesquisa:
+                  </span>
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#967965] text-white rounded-full text-sm font-fancy">
+                    "{searchQuery}"
+                    <button
+                      onClick={clearSearchQuery}
+                      className="hover:text-white/70 transition-colors"
+                      aria-label="Remover pesquisa"
+                    >
+                      ×
+                    </button>
+                  </span>
+                </>
+              )}
+              {selectedCategory !== "todos" && (
+                <>
+                  <span className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
+                    Categoria:
+                  </span>
+                  <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-[#967965] text-white rounded-full text-sm font-fancy">
+                    {labelDaCategoria(selectedCategory)}
+                    <button
+                      onClick={() => setSelectedCategory("todos")}
+                      className="hover:text-white/70 transition-colors"
+                      aria-label="Remover filtro de categoria"
+                    >
+                      ×
+                    </button>
+                  </span>
+                </>
+              )}
             </div>
           )}
         </div>
