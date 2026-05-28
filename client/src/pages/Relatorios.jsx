@@ -573,7 +573,6 @@ const Relatorios = () => {
             )}
           </div>
         )}
-      </main>
 
         {/* TAB: Custos */}
         {tab === "custos" && (
