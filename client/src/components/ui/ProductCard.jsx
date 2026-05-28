@@ -14,6 +14,12 @@ const ProductCard = ({ id, product }) => {
   const touchStartY = useRef(null);
   const isSwiping = useRef(false);
 
+  // Quando a peça vem em "Ambas", o cliente escolhe entre Ouro 18k e Prata 925
+  const isAmbas = product.material === "Ambas";
+  const [selectedMaterial, setSelectedMaterial] = useState(
+    isAmbas ? "Ouro 18k" : product.material,
+  );
+
   const images = product.images || [product.imageUrl];
   const hasMultipleImages = images.length > 1;
   const buttonColor = "#967965";
@@ -22,10 +28,12 @@ const ProductCard = ({ id, product }) => {
   const handleAddToCart = (e) => {
     e.stopPropagation();
 
+    const matFinal = isAmbas ? selectedMaterial : product.material;
     const item = {
-      id: product.dalia_id,
+      id: `${product.dalia_id}${isAmbas ? `-${matFinal.replace(/\s+/g, "_")}` : ""}`,
+      productId: product.dalia_id,
       name: product.name,
-      material: product.material,
+      material: matFinal,
       price: product.price,
       stock: product.stock,
       image: images[0],
@@ -288,6 +296,38 @@ const ProductCard = ({ id, product }) => {
             {description}
           </p>
         </div>
+
+        {/* Seletor de material (Ambas → escolher Ouro 18k ou Prata 925) */}
+        {isAmbas && (
+          <div className="mb-3">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-fancy mb-1.5">
+              Material
+            </p>
+            <div className="flex gap-2">
+              {["Ouro 18k", "Prata 925"].map((mat) => {
+                const active = selectedMaterial === mat;
+                return (
+                  <button
+                    key={mat}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedMaterial(mat);
+                    }}
+                    className={`px-3 py-1.5 text-xs font-fancy rounded-full border transition-all ${
+                      active
+                        ? "bg-[#967965] text-white border-[#967965]"
+                        : "bg-white text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+                    }`}
+                  >
+                    {active && <span className="mr-1">✓</span>}
+                    {mat}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Preço - sempre na mesma posição */}
         <p className="text-lg font-bold font-fancy text-gray-900">
