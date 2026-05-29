@@ -51,6 +51,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
     "brincos",
     "chokers",
     "colares",
+    "conjuntos",
     "correntes",
     "lenços",
     "piercings",

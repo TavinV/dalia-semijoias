@@ -32,6 +32,10 @@ const SYNONYMS = {
     lencos: ["lenco", "lencos"],
     gargantilha: ["gargantilha", "gargantilhas", "choker", "chokers"],
     gargantilhas: ["gargantilha", "gargantilhas", "choker", "chokers"],
+    conjunto: ["conjunto", "conjuntos", "kit", "kits"],
+    conjuntos: ["conjunto", "conjuntos", "kit", "kits"],
+    kit: ["conjunto", "conjuntos", "kit", "kits"],
+    kits: ["conjunto", "conjuntos", "kit", "kits"],
 };
 
 // Remove acentos com Unicode escapes EXPLÍCITOS (à prova de bala)

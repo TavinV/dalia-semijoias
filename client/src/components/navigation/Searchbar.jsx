@@ -14,6 +14,7 @@ const CATEGORIES = [
   { id: "brincos", label: "Brincos" },
   { id: "chokers", label: "Chokers" },
   { id: "colares", label: "Colares" },
+  { id: "conjuntos", label: "Conjuntos" },
   { id: "correntes", label: "Correntes" },
   { id: "lenços", label: "Lenços" },
   { id: "piercings", label: "Piercings" },

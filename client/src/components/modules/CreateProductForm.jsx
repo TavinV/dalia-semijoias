@@ -47,6 +47,7 @@ const CreateProductForm = () => {
     "brincos",
     "chokers",
     "colares",
+    "conjuntos",
     "correntes",
     "lenços",
     "piercings",
