@@ -41,7 +41,7 @@ const NavItens = ({ onCartClick, onSearchClick, isScrolled }) => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0 }}
-                className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 bg-[#967965] text-white text-[10px] sm:text-xs font-medium rounded-full min-w-[16px] h-[16px] sm:min-w-[18px] sm:h-[18px] flex items-center justify-center px-1 shadow-md"
+                className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 bg-[#0B9444] text-white text-[10px] sm:text-xs font-medium rounded-full min-w-[16px] h-[16px] sm:min-w-[18px] sm:h-[18px] flex items-center justify-center px-1 shadow-md"
               >
                 {cart.length > 9 ? "9+" : cart.length}
               </motion.span>

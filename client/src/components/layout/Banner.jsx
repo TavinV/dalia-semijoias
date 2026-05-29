@@ -13,10 +13,10 @@ const Banner = () => {
         >
             <picture className="block w-full h-full">
                 {/* Telas pequenas */}
-                <source media="(max-width: 768px)" srcSet="/banner-mobile.png" />
+                <source media="(max-width: 768px)" srcSet="/hero-banner.jpg?v=2" />
                 {/* Telas grandes */}
                 <img
-                    srcSet="/desktop-banner.png"
+                    srcSet="/hero-banner.jpg?v=2"
                     className="w-full h-full sm:h-auto object-cover object-center"
                     alt="Dália Semijoias"
                 />

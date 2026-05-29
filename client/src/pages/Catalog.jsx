@@ -30,9 +30,40 @@ const UltimasUnidades = ({ products }) => {
     scrollRef.current = el;
   };
 
-  const ultimas = (products || []).filter(
+  // Índice da semana, ancorado em quarta-feira (07/01/1970 foi quarta).
+  // Muda toda quarta → a vitrine reveza sozinha.
+  const getWeekIndex = () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const anchor = new Date(1970, 0, 7);
+    const dayMs = 24 * 60 * 60 * 1000;
+    return Math.floor((today - anchor) / (7 * dayMs));
+  };
+
+  // 3 peças por categoria, com janela rotativa por semana (evita seção gigante)
+  const PER_CAT = 3;
+  const normCat = (s) => (s || "").toString().toLowerCase().trim();
+  const ones = (products || []).filter(
     (p) => Math.max(0, Number(p.stock) || 0) === 1,
   );
+
+  const byCat = {};
+  for (const p of ones) {
+    const c = normCat(p.category) || "outros";
+    (byCat[c] ||= []).push(p);
+  }
+
+  const weekIndex = getWeekIndex();
+  const ultimas = [];
+  for (const cat of Object.keys(byCat).sort()) {
+    const arr = byCat[cat]
+      .slice()
+      .sort((a, b) => (a.dalia_id || "").localeCompare(b.dalia_id || ""));
+    const start = arr.length ? (weekIndex * PER_CAT) % arr.length : 0;
+    for (let i = 0; i < Math.min(PER_CAT, arr.length); i++) {
+      ultimas.push(arr[(start + i) % arr.length]);
+    }
+  }
 
   if (ultimas.length === 0) return null;
 
@@ -84,6 +115,81 @@ const UltimasUnidades = ({ products }) => {
             <div
               key={p._id || p.dalia_id}
               className="snap-start flex-shrink-0 w-[42%] sm:w-[40%] md:w-[30%] lg:w-[23%]"
+            >
+              <ProductCard id={p.dalia_id} product={p} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Coleção Hexa — peças marcadas para a Copa do Mundo (público)
+const ColecaoHexa = ({ products }) => {
+  const scrollRef = { current: null };
+  const setRef = (el) => {
+    scrollRef.current = el;
+  };
+
+  const hexaProducts = (products || []).filter(
+    (p) => p.isBrasil && (Number(p.stock) || 0) >= 1,
+  );
+
+  if (hexaProducts.length === 0) return null;
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({
+        left: -scrollRef.current.offsetWidth / 2,
+        behavior: "smooth",
+      });
+    }
+  };
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({
+        left: scrollRef.current.offsetWidth / 2,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  return (
+    <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-6 mt-2 sm:mt-6">
+      <div className="text-center mb-2 sm:mb-5">
+        <h2 className="font-fancy text-base sm:text-3xl md:text-4xl text-gray-900 tracking-tight">
+          Coleção Hexa
+        </h2>
+        <p className="font-fancy text-[11px] sm:text-base text-gray-500 mt-0.5">
+          Peças para torcer com estilo
+        </p>
+      </div>
+
+      <div className="relative">
+        <button
+          onClick={scrollLeft}
+          className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow items-center justify-center text-gray-500 hover:text-[#967965] hover:border-[#967965] transition-colors"
+          aria-label="Anterior"
+        >
+          ←
+        </button>
+        <button
+          onClick={scrollRight}
+          className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow items-center justify-center text-gray-500 hover:text-[#967965] hover:border-[#967965] transition-colors"
+          aria-label="Próxima"
+        >
+          →
+        </button>
+
+        <div
+          ref={setRef}
+          className="no-scrollbar flex gap-2 sm:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2"
+        >
+          {hexaProducts.map((p) => (
+            <div
+              key={p._id || p.dalia_id}
+              className="snap-start flex-shrink-0 w-[47%] sm:w-[40%] md:w-[30%] lg:w-[23%]"
             >
               <ProductCard id={p.dalia_id} product={p} />
             </div>
@@ -393,6 +499,9 @@ function Catalog() {
       <Banner />
 
       <Main>
+        {/* Coleção Hexa — Copa do Mundo (público) */}
+        <ColecaoHexa products={products} />
+
         {/* Top 5 do mês (público) */}
         <TopMesPublico products={products} />
 
