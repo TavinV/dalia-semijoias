@@ -55,8 +55,8 @@ const UltimasUnidades = ({ products }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-6 sm:mt-16 px-2 sm:px-0">
-      <h2 className="font-fancy text-lg sm:text-3xl text-gray-900 mb-3 sm:mb-6 uppercase tracking-wide px-2 sm:px-0">
+    <div className="max-w-7xl mx-auto mt-4 sm:mt-16 px-2 sm:px-0">
+      <h2 className="font-fancy text-base sm:text-3xl text-gray-900 mb-2 sm:mb-6 uppercase tracking-wide px-2 sm:px-0">
         Últimas Unidades
       </h2>
 
@@ -126,12 +126,12 @@ const TopMesPublico = ({ products }) => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
-      <div className="text-center mb-3 sm:mb-5">
-        <h2 className="font-fancy text-xl sm:text-3xl md:text-4xl text-gray-900 tracking-tight">
+    <div className="w-full max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 py-2 sm:py-6">
+      <div className="text-center mb-2 sm:mb-5">
+        <h2 className="font-fancy text-base sm:text-3xl md:text-4xl text-gray-900 tracking-tight">
           Mais vendidos do mês
         </h2>
-        <p className="font-fancy text-xs sm:text-base text-gray-500 mt-1">
+        <p className="font-fancy text-[11px] sm:text-base text-gray-500 mt-0.5">
           As favoritas das nossas clientes
         </p>
       </div>
@@ -392,19 +392,19 @@ function Catalog() {
         {/* Cabeçalho do catálogo */}
         <div
           id="nosso-catalogo"
-          className="w-full max-w-screen mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 scroll-mt-20"
+          className="w-full max-w-screen mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-12 scroll-mt-16"
         >
-          <div className="text-center space-y-2 sm:space-y-3">
-            <h1 className="font-fancy text-2xl sm:text-4xl md:text-5xl text-gray-900 tracking-tight">
+          <div className="text-center space-y-1 sm:space-y-3">
+            <h1 className="font-fancy text-xl sm:text-4xl md:text-5xl text-gray-900 tracking-tight">
               Nosso catálogo
             </h1>
-            <p className="font-fancy text-sm sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto px-2">
+            <p className="font-fancy text-xs sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto px-2">
               Peças selecionadas com carinho para você
             </p>
           </div>
 
           {/* Toolbar: botão Categorias + Filtros + ordenação */}
-          <div className="mt-6 sm:mt-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 max-w-5xl mx-auto">
+          <div className="mt-4 sm:mt-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 max-w-5xl mx-auto">
             <div className="flex items-center gap-2 flex-1 sm:flex-initial">
               <button
                 onClick={() => {

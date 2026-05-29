@@ -298,10 +298,10 @@ const ProductCard = ({ id, product }) => {
       </div>
 
       {/* Informações do produto */}
-      <div className="pt-2 sm:pt-6 pb-2 sm:pb-4 px-1 sm:px-0">
+      <div className="pt-1.5 sm:pt-6 pb-1.5 sm:pb-4 px-1 sm:px-0">
         {/* Nome do produto - linha única com truncate */}
         <h3
-          className="text-[13px] sm:text-lg font-fancy font-medium sm:font-bold text-gray-900 tracking-wide mb-0.5 sm:mb-2 truncate leading-snug"
+          className="text-[12px] sm:text-lg font-fancy font-medium sm:font-bold text-gray-900 tracking-wide mb-0.5 sm:mb-2 truncate leading-snug"
           title={product.name}
         >
           {product.name}
@@ -343,7 +343,7 @@ const ProductCard = ({ id, product }) => {
         )}
 
         {/* Preço */}
-        <p className="text-[15px] sm:text-lg font-bold font-fancy text-gray-900 leading-none">
+        <p className="text-[13px] sm:text-lg font-bold font-fancy text-gray-900 leading-none">
           R$ {product.price.toFixed(2)}
         </p>
       </div>
