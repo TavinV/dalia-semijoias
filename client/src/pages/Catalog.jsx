@@ -126,24 +126,24 @@ const TopMesPublico = ({ products }) => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-      <div className="text-center mb-8">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
+      <div className="text-center mb-4 sm:mb-5">
         <h2 className="font-fancy text-2xl sm:text-3xl md:text-4xl text-gray-900 tracking-tight">
           Mais vendidos do mês
         </h2>
-        <p className="font-fancy text-sm sm:text-base text-gray-500 mt-2">
+        <p className="font-fancy text-sm sm:text-base text-gray-500 mt-1.5">
           As favoritas das nossas clientes
         </p>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-6 sm:gap-8">
+      <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
         {topItems.map((t, idx) => {
           const matched = productByName[(t.name || "").toLowerCase().trim()];
           if (!matched) return null;
           return (
             <div
               key={`${t.name}-${idx}`}
-              className="relative w-[calc(50%-12px)] sm:w-[280px] md:w-[300px] xl:w-[280px]"
+              className="relative w-[calc(50%-6px)] sm:w-[240px] md:w-[260px] xl:w-[260px]"
             >
               <span className="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-[#967965] text-white text-sm font-bold flex items-center justify-center shadow-lg">
                 {idx + 1}
