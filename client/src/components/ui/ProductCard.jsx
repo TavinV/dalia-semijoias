@@ -203,7 +203,7 @@ const ProductCard = ({ id, product }) => {
         {/* Botão Plus */}
         <motion.button
           onClick={handleAddToCart}
-          className="absolute bottom-6 right-6 w-12 h-12 rounded-full flex items-center justify-center shadow-lg z-10"
+          className="absolute bottom-3 right-3 sm:bottom-6 sm:right-6 w-9 h-9 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg z-10"
           style={{
             backgroundColor: buttonColor,
             boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
@@ -213,11 +213,12 @@ const ProductCard = ({ id, product }) => {
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
           <svg
-            width="20"
-            height="20"
+            width="16"
+            height="16"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            className="sm:w-5 sm:h-5"
           >
             <path
               d="M12 4V20M4 12H20"
@@ -297,20 +298,18 @@ const ProductCard = ({ id, product }) => {
       </div>
 
       {/* Informações do produto - CORRIGIDO: altura fixa para alinhamento */}
-      <div className="pt-6 pb-4 px-0">
+      <div className="pt-3 sm:pt-6 pb-3 sm:pb-4 px-1 sm:px-0">
         {/* Nome do produto - linha única com truncate */}
         <h3
-          className="text-lg font-fancy font-bold text-gray-900 tracking-wide mb-2 truncate"
+          className="text-sm sm:text-lg font-fancy font-bold text-gray-900 tracking-wide mb-1 sm:mb-2 truncate"
           title={product.name}
         >
           {product.name}
         </h3>
 
-        {/* Descrição - altura fixa de 3 linhas com line-clamp */}
-        <div className="sm:h-[2.5rem] h-[3.5rem] mb-3">
-          {" "}
-          {/* 3 linhas * 1.5rem line-height = 4.5rem */}
-          <p className="text-sm text-gray-900 font-fancy leading-relaxed line-clamp-3">
+        {/* Descrição - altura fixa de 2-3 linhas com line-clamp */}
+        <div className="h-[2.25rem] sm:h-[2.5rem] mb-2 sm:mb-3">
+          <p className="text-xs sm:text-sm text-gray-900 font-fancy leading-snug line-clamp-2 sm:line-clamp-3">
             {description}
           </p>
         </div>
@@ -348,7 +347,7 @@ const ProductCard = ({ id, product }) => {
         )}
 
         {/* Preço - sempre na mesma posição */}
-        <p className="text-lg font-bold font-fancy text-gray-900">
+        <p className="text-base sm:text-lg font-bold font-fancy text-gray-900">
           R$ {product.price.toFixed(2)}
         </p>
       </div>

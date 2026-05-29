@@ -126,12 +126,12 @@ const TopMesPublico = ({ products }) => {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
-      <div className="text-center mb-4 sm:mb-5">
-        <h2 className="font-fancy text-2xl sm:text-3xl md:text-4xl text-gray-900 tracking-tight">
+    <div className="w-full max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6">
+      <div className="text-center mb-3 sm:mb-5">
+        <h2 className="font-fancy text-xl sm:text-3xl md:text-4xl text-gray-900 tracking-tight">
           Mais vendidos do mês
         </h2>
-        <p className="font-fancy text-sm sm:text-base text-gray-500 mt-1.5">
+        <p className="font-fancy text-xs sm:text-base text-gray-500 mt-1">
           As favoritas das nossas clientes
         </p>
       </div>
@@ -392,32 +392,32 @@ function Catalog() {
         {/* Cabeçalho do catálogo */}
         <div
           id="nosso-catalogo"
-          className="w-full max-w-screen mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 scroll-mt-24"
+          className="w-full max-w-screen mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-12 scroll-mt-20"
         >
-          <div className="text-center space-y-4">
-            <h1 className="font-fancy text-3xl sm:text-4xl md:text-5xl text-gray-900 tracking-tight">
+          <div className="text-center space-y-2 sm:space-y-3">
+            <h1 className="font-fancy text-2xl sm:text-4xl md:text-5xl text-gray-900 tracking-tight">
               Nosso catálogo
             </h1>
-            <p className="font-fancy text-base sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto">
+            <p className="font-fancy text-sm sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto px-2">
               Peças selecionadas com carinho para você
             </p>
           </div>
 
           {/* Toolbar: botão Categorias + Filtros + ordenação */}
-          <div className="mt-10 sm:mt-12 flex flex-wrap items-center justify-between gap-3 max-w-5xl mx-auto">
-            <div className="flex flex-wrap items-center gap-2">
+          <div className="mt-6 sm:mt-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 max-w-5xl mx-auto">
+            <div className="flex items-center gap-2 flex-1 sm:flex-initial">
               <button
                 onClick={() => {
                   setShowCategoriesPanel((v) => !v);
                   if (!showCategoriesPanel) setShowFilters(false);
                 }}
-                className={`inline-flex items-center gap-2 px-5 py-2.5 border rounded-full font-fancy text-sm transition-all ${
+                className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 border rounded-full font-fancy text-xs sm:text-sm transition-all ${
                   showCategoriesPanel || selectedCategory !== "todos"
                     ? "bg-[#967965] text-white border-[#967965]"
                     : "bg-white text-gray-700 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
                 }`}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
                   <rect x="3" y="3" width="7" height="7" />
                   <rect x="14" y="3" width="7" height="7" />
                   <rect x="3" y="14" width="7" height="7" />
@@ -425,7 +425,7 @@ function Catalog() {
                 </svg>
                 Categorias
                 {selectedCategory !== "todos" && (
-                  <span className="ml-1 px-2 py-0.5 text-[10px] bg-white text-[#967965] rounded-full font-bold">
+                  <span className="px-1.5 py-0.5 text-[10px] bg-white text-[#967965] rounded-full font-bold">
                     1
                   </span>
                 )}
@@ -436,13 +436,13 @@ function Catalog() {
                   setShowFilters((v) => !v);
                   if (!showFilters) setShowCategoriesPanel(false);
                 }}
-                className={`inline-flex items-center gap-2 px-5 py-2.5 border rounded-full font-fancy text-sm transition-all ${
+                className={`flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2 sm:py-2.5 border rounded-full font-fancy text-xs sm:text-sm transition-all ${
                   showFilters || selectedMaterials.length > 0 || selectedGenders.length > 0 || (maxPrice !== null && maxPrice < priceCap)
                     ? "bg-[#967965] text-white border-[#967965]"
                     : "bg-white text-gray-700 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
                 }`}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0">
                   <line x1="4" y1="6" x2="20" y2="6" />
                   <line x1="6" y1="12" x2="18" y2="12" />
                   <line x1="9" y1="18" x2="15" y2="18" />
@@ -451,7 +451,7 @@ function Catalog() {
                 {(selectedMaterials.length > 0 ||
                   selectedGenders.length > 0 ||
                   (maxPrice !== null && maxPrice < priceCap)) && (
-                  <span className="ml-1 px-1.5 py-0.5 text-[10px] bg-white text-[#967965] rounded-full font-bold">
+                  <span className="px-1.5 py-0.5 text-[10px] bg-white text-[#967965] rounded-full font-bold">
                     {selectedMaterials.length +
                       selectedGenders.length +
                       (maxPrice !== null && maxPrice < priceCap ? 1 : 0)}
@@ -460,15 +460,15 @@ function Catalog() {
               </button>
             </div>
 
-            <div className="flex items-center gap-2 font-fancy">
-              <label htmlFor="sort" className="text-xs uppercase tracking-[0.2em] text-gray-400">
+            <div className="flex items-center gap-2 font-fancy justify-end">
+              <label htmlFor="sort" className="hidden sm:inline text-xs uppercase tracking-[0.2em] text-gray-400">
                 Ordenar
               </label>
               <select
                 id="sort"
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-transparent text-sm text-gray-700 border-b border-gray-300 focus:border-[#967965] outline-none px-2 py-1 cursor-pointer"
+                className="bg-transparent text-xs sm:text-sm text-gray-700 border-b border-gray-300 focus:border-[#967965] outline-none px-2 py-1 cursor-pointer flex-1 sm:flex-initial"
               >
                 <option value="procuradas">Mais vendidos</option>
                 <option value="caras">Preço: maior → menor</option>
@@ -479,7 +479,7 @@ function Catalog() {
 
           {/* Painel de categorias (abre ao clicar em "Categorias") */}
           {showCategoriesPanel && (
-            <div className="mt-6 max-w-5xl mx-auto bg-white/60 backdrop-blur-sm border border-[#967965]/20 rounded-lg p-5 sm:p-6">
+            <div className="mt-4 sm:mt-6 max-w-5xl mx-auto bg-white/60 backdrop-blur-sm border border-[#967965]/20 rounded-lg p-4 sm:p-6">
               <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-3 font-fancy">
                 Escolha uma categoria
               </p>
@@ -510,7 +510,7 @@ function Catalog() {
 
           {/* Painel de filtros (abre ao clicar em "Filtros") */}
           {showFilters && (
-            <div className="mt-6 max-w-5xl mx-auto bg-white/60 backdrop-blur-sm border border-[#967965]/20 rounded-lg p-5 sm:p-6 space-y-6">
+            <div className="mt-4 sm:mt-6 max-w-5xl mx-auto bg-white/60 backdrop-blur-sm border border-[#967965]/20 rounded-lg p-4 sm:p-6 space-y-5 sm:space-y-6">
               {/* Material — multi-select */}
               <div>
                 <p className="text-xs uppercase tracking-[0.2em] text-gray-500 mb-3 font-fancy">
@@ -623,7 +623,7 @@ function Catalog() {
 
           {/* Tags visuais — pesquisa e categoria ativas (vindas do SearchBar via URL) */}
           {(selectedCategory !== "todos" || searchQuery) && (
-            <div className="flex flex-wrap items-center justify-center gap-2 mt-6">
+            <div className="flex flex-wrap items-center justify-center gap-2 mt-4 sm:mt-6">
               {searchQuery && (
                 <>
                   <span className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
@@ -663,15 +663,15 @@ function Catalog() {
         </div>
 
         {/* Contagem total + grid paginado */}
-        <div className="px-4 sm:px-6 lg:px-8 pb-0">
+        <div className="px-3 sm:px-6 lg:px-8 pb-0">
           {!loading && (
-            <div className="max-w-7xl mx-auto mb-4 flex items-center justify-between">
-              <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
+            <div className="max-w-7xl mx-auto mb-3 sm:mb-4 flex items-center justify-between">
+              <p className="text-[10px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] text-gray-400 font-fancy">
                 {sortedProducts.length}{" "}
                 {sortedProducts.length === 1 ? "peça" : "peças"}
               </p>
               {totalPages > 1 && (
-                <p className="text-xs uppercase tracking-[0.2em] text-gray-400 font-fancy">
+                <p className="text-[10px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] text-gray-400 font-fancy">
                   Página {safePage} de {totalPages}
                 </p>
               )}
@@ -689,19 +689,19 @@ function Catalog() {
 
               {/* Paginação */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-1 sm:gap-2 mt-8 mb-12">
+                <div className="flex items-center justify-center gap-0.5 sm:gap-2 mt-6 sm:mt-8 mb-8 sm:mb-12 flex-wrap px-2">
                   <button
                     onClick={() => setPage(Math.max(1, safePage - 1))}
                     disabled={safePage === 1}
-                    className="px-3 py-2 text-sm font-fancy text-gray-600 hover:text-[#967965] disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                    className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-fancy text-gray-600 hover:text-[#967965] disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
                   >
-                    ← Anterior
+                    ← <span className="hidden sm:inline">Anterior</span>
                   </button>
                   {pageNumbers.map((p, idx) =>
                     p === "…" ? (
                       <span
                         key={`gap-${idx}`}
-                        className="px-2 text-gray-400 font-fancy"
+                        className="px-1 sm:px-2 text-gray-400 font-fancy text-xs sm:text-base"
                       >
                         …
                       </span>
@@ -709,7 +709,7 @@ function Catalog() {
                       <button
                         key={p}
                         onClick={() => setPage(p)}
-                        className={`min-w-[36px] h-9 px-2 text-sm font-fancy rounded-full transition-all ${
+                        className={`min-w-[30px] sm:min-w-[36px] h-8 sm:h-9 px-1.5 sm:px-2 text-xs sm:text-sm font-fancy rounded-full transition-all ${
                           p === safePage
                             ? "bg-[#967965] text-white"
                             : "text-gray-600 hover:bg-[#967965]/10 hover:text-[#967965]"
@@ -722,9 +722,9 @@ function Catalog() {
                   <button
                     onClick={() => setPage(Math.min(totalPages, safePage + 1))}
                     disabled={safePage === totalPages}
-                    className="px-3 py-2 text-sm font-fancy text-gray-600 hover:text-[#967965] disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
+                    className="px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-fancy text-gray-600 hover:text-[#967965] disabled:text-gray-300 disabled:cursor-not-allowed transition-colors"
                   >
-                    Próxima →
+                    <span className="hidden sm:inline">Próxima</span> →
                   </button>
                 </div>
               )}
