@@ -136,14 +136,14 @@ const TopMesPublico = ({ products }) => {
         </p>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
         {topItems.map((t, idx) => {
           const matched = productByName[(t.name || "").toLowerCase().trim()];
           if (!matched) return null;
           return (
             <div
               key={`${t.name}-${idx}`}
-              className="relative w-[calc(50%-6px)] sm:w-[240px] md:w-[260px] xl:w-[260px]"
+              className="relative w-[42%] sm:w-[200px] md:w-[220px] xl:w-[240px]"
             >
               <span className="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-[#967965] text-white text-sm font-bold flex items-center justify-center shadow-lg">
                 {idx + 1}

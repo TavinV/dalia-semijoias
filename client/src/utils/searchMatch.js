@@ -1,6 +1,5 @@
 // Matching de busca: multi-palavra, AND, com sinônimos e sem acentos
 // Ex.: "brinco ouro" casa com produto category=brincos + material="Ouro 18k"
-// Ex.: "anel prateado feminino" casa com anéis em prata femininos
 // Cada termo precisa achar match em algum dos campos do produto.
 
 const SYNONYMS = {
@@ -10,7 +9,6 @@ const SYNONYMS = {
     prata: ["prata", "prateado", "prateada", "silver"],
     prateado: ["prata", "prateado", "prateada"],
     prateada: ["prata", "prateado", "prateada"],
-    // singulares ↔ plurais comuns de categoria
     brinco: ["brinco", "brincos"],
     brincos: ["brinco", "brincos"],
     anel: ["anel", "aneis"],
@@ -32,9 +30,11 @@ const SYNONYMS = {
     bodychain: ["bodychain", "body", "chain", "chains"],
     lenco: ["lenco", "lencos"],
     lencos: ["lenco", "lencos"],
+    gargantilha: ["gargantilha", "gargantilhas", "choker", "chokers"],
+    gargantilhas: ["gargantilha", "gargantilhas", "choker", "chokers"],
 };
 
-// Remove acentos via Unicode escapes (mais robusto que caracteres literais)
+// Remove acentos com Unicode escapes EXPLÍCITOS (à prova de bala)
 export const normalize = (s) =>
     (s || "")
         .toString()

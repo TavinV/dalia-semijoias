@@ -4,7 +4,7 @@ import SectionTitle from "../ui/SectionTitle";
 
 const ProductsGrid = ({ products, title }) => {
   return (
-    <div className="flex flex-col  w-screen max-w-screen overflow-hidden" data-catalog-grid>
+    <div className="flex flex-col w-full max-w-full overflow-hidden" data-catalog-grid>
       <div
         className="
                     grid
