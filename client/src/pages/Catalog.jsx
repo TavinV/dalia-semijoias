@@ -136,16 +136,16 @@ const TopMesPublico = ({ products }) => {
         </p>
       </div>
 
-      <div className="flex flex-wrap justify-center gap-3 xs:gap-2 sm:gap-4">
+      <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
         {topItems.map((t, idx) => {
           const matched = productByName[(t.name || "").toLowerCase().trim()];
           if (!matched) return null;
           return (
             <div
               key={`${t.name}-${idx}`}
-              className="relative w-full xs:w-[42%] sm:w-[200px] md:w-[220px] xl:w-[240px] max-w-[280px]"
+              className="relative w-[47%] sm:w-[200px] md:w-[220px] xl:w-[240px] max-w-[280px]"
             >
-              <span className="absolute top-2 left-2 z-20 w-8 h-8 rounded-full bg-[#967965] text-white text-sm font-bold flex items-center justify-center shadow-lg">
+              <span className="absolute top-1.5 left-1.5 z-20 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-[#967965] text-white text-[11px] sm:text-sm font-bold flex items-center justify-center shadow-lg">
                 {idx + 1}
               </span>
               <ProductCard id={matched.dalia_id} product={matched} />
