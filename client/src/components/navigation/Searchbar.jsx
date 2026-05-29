@@ -96,21 +96,24 @@ const SearchBar = ({ isOpen, onClose }) => {
     next.delete("cat");
     next.set("q", product.name);
     setSearchParams(next, { replace: true });
+    setQuery("");
     onClose();
     if (window.location.pathname !== "/") {
       navigate({ pathname: "/", search: next.toString() });
     }
-    // Tentar fazer scroll até o produto após a navegação/render
-    setTimeout(() => {
-      const el = document.getElementById(product.dalia_id);
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth", block: "center" });
-      } else {
-        // fallback: rolar até o início da grade do catálogo
-        const grid = document.querySelector("[data-catalog-grid]");
-        if (grid) grid.scrollIntoView({ behavior: "smooth", block: "start" });
+    // Tenta rolar até a peça em múltiplas tentativas (espera o catálogo re-render)
+    const tryScroll = (attemptsLeft = 8) => {
+      const target =
+        document.getElementById(product.dalia_id) ||
+        document.querySelector("[data-catalog-grid]") ||
+        document.getElementById("nosso-catalogo");
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (attemptsLeft > 0) {
+        setTimeout(() => tryScroll(attemptsLeft - 1), 120);
       }
-    }, 250);
+    };
+    setTimeout(() => tryScroll(8), 200);
   };
 
   const highlightText = (text, highlight) => {

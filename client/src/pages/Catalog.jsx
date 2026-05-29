@@ -730,17 +730,34 @@ function Catalog() {
               )}
             </>
           ) : (
-            <div className="text-center py-16">
-              <p className="font-fancy text-gray-400 text-lg">
-                Nenhum produto encontrado com esses filtros
+            <div className="text-center py-12 sm:py-16 px-4">
+              <p className="font-fancy text-gray-500 text-base sm:text-lg mb-2">
+                Nenhum produto encontrado
               </p>
-              {algumFiltroAtivo && (
-                <button
-                  onClick={limparFiltros}
-                  className="mt-3 text-sm font-fancy text-[#967965] underline-offset-4 hover:underline"
-                >
-                  Limpar filtros
-                </button>
+              {searchQuery && (
+                <p className="text-sm text-gray-400 mb-4">
+                  Sua busca por <strong>"{searchQuery}"</strong> não retornou resultados
+                </p>
+              )}
+              {(algumFiltroAtivo || searchQuery) && (
+                <div className="flex flex-wrap items-center justify-center gap-2 mt-2">
+                  {searchQuery && (
+                    <button
+                      onClick={clearSearchQuery}
+                      className="px-4 py-2 text-xs sm:text-sm font-fancy bg-[#967965] text-white rounded-full hover:bg-[#7A5F4F] transition-colors"
+                    >
+                      Limpar pesquisa
+                    </button>
+                  )}
+                  {algumFiltroAtivo && !searchQuery && (
+                    <button
+                      onClick={limparFiltros}
+                      className="px-4 py-2 text-xs sm:text-sm font-fancy bg-[#967965] text-white rounded-full hover:bg-[#7A5F4F] transition-colors"
+                    >
+                      Limpar filtros
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           )}
