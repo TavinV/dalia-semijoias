@@ -41,6 +41,10 @@ const updateProductSchema = Joi.object({
             "number.min": "O custo da embalagem não pode ser negativo",
         }),
 
+    imagesGoldCount: Joi.number()
+        .integer()
+        .min(0),
+
     category: Joi.string()
         .min(3)
         .max(255)

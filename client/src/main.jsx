@@ -5,6 +5,7 @@ import { CartProvider } from './context/CartContext.jsx';
 
 import './index.css'
 
+import PageWrapper from './components/layout/PageWrapper.jsx';
 import ErrorPage from './pages/ErrorPage.jsx';
 import Catalog from './pages/Catalog.jsx'
 import LoginPage from './pages/LoginPage.jsx';
@@ -18,55 +19,21 @@ import FornecedorDetail from './pages/FornecedorDetail.jsx';
 import Saidas from './pages/Saidas.jsx';
 import Relatorios from './pages/Relatorios.jsx';
 
+const wrap = (el) => <PageWrapper>{el}</PageWrapper>;
+
 const router = createBrowserRouter([
-  {
-    path: '/',
-    element: <Catalog />,
-  },
-  {
-    path: '/error',
-    element: <ErrorPage />
-  },
-  {
-    path: '/login',
-    element: <LoginPage />
-  },
-  {
-    path: '/dashboard',
-    element: <Dashboard />
-  },
-  {
-    path: '/create-product',
-    element: <CreateProductPage />
-  },
-  {
-    path: '/clients',
-    element: <Clients />
-  },
-  {
-    path: '/clients/:id',
-    element: <ClientDetail />
-  },
-  {
-    path: '/pendencies',
-    element: <Pendencies />
-  },
-  {
-    path: '/admin/fornecedores',
-    element: <Fornecedores />
-  },
-  {
-    path: '/admin/fornecedores/:id',
-    element: <FornecedorDetail />
-  },
-  {
-    path: '/admin/saidas',
-    element: <Saidas />
-  },
-  {
-    path: '/admin/relatorios',
-    element: <Relatorios />
-  }
+  { path: '/', element: wrap(<Catalog />) },
+  { path: '/error', element: wrap(<ErrorPage />) },
+  { path: '/login', element: wrap(<LoginPage />) },
+  { path: '/dashboard', element: wrap(<Dashboard />) },
+  { path: '/create-product', element: wrap(<CreateProductPage />) },
+  { path: '/clients', element: wrap(<Clients />) },
+  { path: '/clients/:id', element: wrap(<ClientDetail />) },
+  { path: '/pendencies', element: wrap(<Pendencies />) },
+  { path: '/admin/fornecedores', element: wrap(<Fornecedores />) },
+  { path: '/admin/fornecedores/:id', element: wrap(<FornecedorDetail />) },
+  { path: '/admin/saidas', element: wrap(<Saidas />) },
+  { path: '/admin/relatorios', element: wrap(<Relatorios />) },
 ]);
 
 createRoot(document.getElementById('root')).render(

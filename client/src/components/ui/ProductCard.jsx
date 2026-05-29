@@ -23,12 +23,22 @@ const ProductCard = ({ id, product }) => {
   const images = product.images || [product.imageUrl];
   const hasMultipleImages = images.length > 1;
 
-  // Em "Ambas", 1ª foto = Ouro, 2ª = Prata. Ao trocar o material, troca a foto.
+  // Em "Ambas": imagens 0..goldCount-1 são Ouro, goldCount..fim são Prata.
+  // Ao trocar o material, vai pra primeira foto da seção correspondente.
   const handlePickMaterial = (mat) => {
     setSelectedMaterial(mat);
     if (!isAmbas) return;
-    if (mat === "Ouro 18k") setCurrentImageIndex(0);
-    else if (mat === "Prata 925" && images.length > 1) setCurrentImageIndex(1);
+    const goldCount = Math.max(0, Number(product.imagesGoldCount) || 0);
+    if (mat === "Ouro 18k") {
+      setCurrentImageIndex(0);
+    } else if (mat === "Prata 925") {
+      if (goldCount > 0 && goldCount < images.length) {
+        setCurrentImageIndex(goldCount);
+      } else if (images.length > 1) {
+        // fallback (produto antigo sem imagesGoldCount): assume 2ª foto = Prata
+        setCurrentImageIndex(1);
+      }
+    }
   };
   const buttonColor = "#967965";
   const buttonColorDarker = "#6B5847";
