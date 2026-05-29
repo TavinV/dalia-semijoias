@@ -8,18 +8,16 @@ const ProductsGrid = ({ products, title }) => {
       <div
         className="
                     grid
-                    grid-cols-2        /* 2 colunas sempre em mobile */
-                    md:grid-cols-3     /* 3 colunas em tablet (768+) */
-                    xl:grid-cols-4     /* 4 colunas em desktop grande (1280+) */
-                    gap-2              /* gap apertado em mobile */
-                    sm:gap-4           /* gap médio em tablet */
-                    lg:gap-6           /* gap maior em desktop */
-                    w-full
+                    grid-cols-2        /* 2 colunas em mobile (igual skeleton) */
+                    md:grid-cols-3     /* 3 colunas em tablet */
+                    xl:grid-cols-4     /* 4 colunas em desktop grande */
+                    gap-6              /* gap mobile = skeleton */
+                    sm:gap-8           /* gap tablet = skeleton */
+                    w-screen
                     max-w-full
                     m-0
-                    px-2 py-2          /* padding mínimo mobile */
-                    sm:p-4             /* padding maior em tablet+ */
-                    lg:p-6             /* padding ainda maior em desktop */
+                    p-6                /* padding mobile = skeleton */
+                    sm:p-8             /* padding tablet = skeleton */
                 "
       >
         {products.map((product) =>

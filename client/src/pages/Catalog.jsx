@@ -664,7 +664,7 @@ function Catalog() {
         </div>
 
         {/* Contagem total + grid paginado */}
-        <div className="px-3 sm:px-6 lg:px-8 pb-0">
+        <div className="w-full px-3 sm:px-6 lg:px-8 pb-0">
           {!loading && (
             <div className="max-w-7xl mx-auto mb-3 sm:mb-4 flex items-center justify-between">
               <p className="text-[10px] sm:text-xs uppercase tracking-[0.15em] sm:tracking-[0.2em] text-gray-400 font-fancy">
