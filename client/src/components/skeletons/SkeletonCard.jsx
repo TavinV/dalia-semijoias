@@ -2,7 +2,7 @@ const SkeletonCard = () => {
   return (
     <div className="w-full h-full animate-pulse">
       {/* imagem */}
-      <div className="w-full aspect-square bg-gray-400 rounded"></div>
+      <div className="w-full aspect-square bg-gray-400 rounded-2xl"></div>
 
       {/* conteúdo */}
       <div className="mt-4 space-y-2">

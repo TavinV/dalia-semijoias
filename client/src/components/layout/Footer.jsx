@@ -1,6 +1,7 @@
 // Footer.jsx
+import { useState, useRef } from "react";
 import Logo from "../ui/Logo";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { FiInstagram, FiMail, FiPhone } from "react-icons/fi";
 import { LuHeart, LuArrowUpRight } from "react-icons/lu";
 
@@ -17,6 +18,24 @@ const collections = [
 ];
 
 const Footer = () => {
+  const navigate = useNavigate();
+  const [clickCount, setClickCount] = useState(0);
+  const resetTimerRef = useRef(null);
+
+  // Botão escondido: 5 cliques no copyright em até 3s entre eles → /login
+  const handleSecretClick = (e) => {
+    e.preventDefault();
+    if (resetTimerRef.current) clearTimeout(resetTimerRef.current);
+    const next = clickCount + 1;
+    if (next >= 5) {
+      setClickCount(0);
+      navigate("/login");
+      return;
+    }
+    setClickCount(next);
+    resetTimerRef.current = setTimeout(() => setClickCount(0), 3000);
+  };
+
   return (
     <>
       <footer className="w-full bg-[#F5F0EB] relative font-inter">
@@ -149,12 +168,14 @@ const Footer = () => {
       {/* Copyright com design refinado */}
       <div className="w-full bg-[#4A3F3A] py-5 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <NavLink
-            to="/dashboard"
-            className="text-xs text-[#E0D6CF] hover:text-white transition-colors duration-300 tracking-wide"
+          <button
+            type="button"
+            onClick={handleSecretClick}
+            className="text-xs text-[#E0D6CF] hover:text-white transition-colors duration-300 tracking-wide bg-transparent border-0 cursor-default select-none"
+            aria-label="Copyright"
           >
             © 2025 Dália Concept - Todos os direitos reservados
-          </NavLink>
+          </button>
 
           <div className="flex items-center gap-4">
             <span className="text-xs text-[#8B7A70]">|</span>

@@ -11,6 +11,8 @@ const CreateProductForm = () => {
     name: "",
     description: "",
     price: "",
+    custo: "",
+    custoEmbalagem: "",
     category: "",
     material: "",
     gender: "",
@@ -19,6 +21,9 @@ const CreateProductForm = () => {
 
   // Estado para múltiplas imagens
   const [images, setImages] = useState([]);
+  // Quando o material é "Ambas": quantas das primeiras imagens são da versão Ouro
+  // (as demais são da versão Prata). Pra fazer 2 seções separadas no UI.
+  const [imagesGoldCount, setImagesGoldCount] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
@@ -30,14 +35,21 @@ const CreateProductForm = () => {
   const [successMessage, setSuccessMessage] = useState(null);
 
   const fileInputRef = useRef(null);
+  const goldFileInputRef = useRef(null);
+  const silverFileInputRef = useRef(null);
 
-  const genderOptions = ["Masculino", "Feminino"];
-  const materialOptions = ["Ouro 18k", "Prata 925", "Outros"];
+  const genderOptions = ["Masculino", "Feminino", "Unissex"];
+  const materialOptions = ["Ouro 18k", "Prata 925", "Ambas", "Outros"];
   const categoryOptions = [
     "anéis",
-    "brincos",
+    "body chains",
     "braceletes",
+    "brincos",
+    "chokers",
     "colares",
+    "conjuntos",
+    "correntes",
+    "lenços",
     "piercings",
     "pulseiras",
     "tornozeleiras",
@@ -72,6 +84,54 @@ const CreateProductForm = () => {
         reader.readAsDataURL(file);
       }
     });
+  };
+
+  // Para a seção "Dourado" (Ambas): insere a foto na posição imagesGoldCount e incrementa o contador
+  const handleGoldImageSelect = (e) => {
+    const files = Array.from(e.target.files);
+    files.forEach((file) => {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImages((prev) => {
+          const insertAt = imagesGoldCount;
+          const next = [...prev];
+          next.splice(insertAt, 0, {
+            file,
+            preview: reader.result,
+            croppedFile: null,
+            order: insertAt,
+          });
+          return next.map((img, idx) => ({ ...img, order: idx }));
+        });
+        setImagesGoldCount((c) => c + 1);
+      };
+      reader.readAsDataURL(file);
+    });
+    // limpa o input pra permitir re-selecionar o mesmo arquivo
+    if (e.target) e.target.value = "";
+  };
+
+  // Para a seção "Prata" (Ambas): apenas appenda no fim
+  const handleSilverImageSelect = (e) => {
+    const files = Array.from(e.target.files);
+    files.forEach((file) => {
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        setImages((prev) => [
+          ...prev,
+          {
+            file,
+            preview: reader.result,
+            croppedFile: null,
+            order: prev.length,
+          },
+        ]);
+      };
+      reader.readAsDataURL(file);
+    });
+    if (e.target) e.target.value = "";
   };
 
   const handleImageCrop = async () => {
@@ -111,6 +171,10 @@ const CreateProductForm = () => {
 
   const removeImage = (index) => {
     setImages((prev) => prev.filter((_, idx) => idx !== index));
+    // Se a foto removida estava na seção Ouro, decrementa o contador
+    if (index < imagesGoldCount) {
+      setImagesGoldCount((c) => Math.max(0, c - 1));
+    }
     if (currentImageIndex === index) {
       setShowCropper(false);
       setCurrentImageIndex(null);
@@ -139,12 +203,32 @@ const CreateProductForm = () => {
       return;
     }
 
+    // Quando material é "Ambas", exige pelo menos 1 foto Ouro e 1 foto Prata
+    if (formData.material === "Ambas") {
+      if (imagesGoldCount < 1) {
+        setError("Adicione pelo menos 1 foto na seção 'Imagens — Dourado'");
+        setLoading(false);
+        return;
+      }
+      if (images.length - imagesGoldCount < 1) {
+        setError("Adicione pelo menos 1 foto na seção 'Imagens — Prata'");
+        setLoading(false);
+        return;
+      }
+    }
+
     const payload = new FormData();
 
     // Adicionar dados do formulário
     Object.entries(formData).forEach(([key, value]) => {
       payload.append(key, value);
     });
+
+    // Sinaliza pro backend quantas das primeiras imagens são da versão Ouro
+    payload.append(
+      "imagesGoldCount",
+      formData.material === "Ambas" ? imagesGoldCount : 0,
+    );
 
     // Adicionar múltiplas imagens
     images.forEach((img, index) => {
@@ -163,12 +247,15 @@ const CreateProductForm = () => {
           name: "",
           description: "",
           price: "",
+          custo: "",
+          custoEmbalagem: "",
           category: "",
           material: "",
           gender: "",
           stock: "",
         });
         setImages([]);
+        setImagesGoldCount(0);
         setCurrentImageIndex(null);
         setShowCropper(false);
       } else {
@@ -228,7 +315,7 @@ const CreateProductForm = () => {
             </AnimatePresence>
 
             <div className="space-y-6">
-              {/* Nome e Preço */}
+              {/* Nome, Preço, Custo */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -244,20 +331,52 @@ const CreateProductForm = () => {
                     required
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Preço (R$) *
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    name="price"
-                    value={formData.price}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
-                    placeholder="0,00"
-                    required
-                  />
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Preço (R$) *
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="price"
+                      value={formData.price}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
+                      placeholder="0,00"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Custo peça (R$)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      name="custo"
+                      value={formData.custo}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Embalagem (R$)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      name="custoEmbalagem"
+                      value={formData.custoEmbalagem}
+                      onChange={handleChange}
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors"
+                      placeholder="0,00"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -272,8 +391,7 @@ const CreateProductForm = () => {
                   onChange={handleChange}
                   rows="4"
                   className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors resize-none"
-                  placeholder="Descreva o produto em detalhes..."
-                  minLength="10"
+                  placeholder="Descreva o produto..."
                   required
                 />
               </div>
@@ -358,29 +476,27 @@ const CreateProductForm = () => {
 
               {/* Seção de Imagens */}
               <div className="border-t border-gray-100 pt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  Imagens do Produto * (mínimo 1)
-                </label>
+                {(() => {
+                  const isAmbas = formData.material === "Ambas";
 
-                {/* Grid de uploads */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
-                  {images.map((img, index) => (
+                  // Card de uma imagem (mesmo estilo nas 2 seções e no caso simples)
+                  const renderImageCard = (img, globalIndex) => (
                     <motion.div
-                      key={index}
+                      key={globalIndex}
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className="relative group aspect-square"
                     >
                       <img
                         src={img.preview}
-                        alt={`Produto ${index + 1}`}
+                        alt={`Produto ${globalIndex + 1}`}
                         className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                         <button
                           type="button"
                           onClick={() => {
-                            setCurrentImageIndex(index);
+                            setCurrentImageIndex(globalIndex);
                             setShowCropper(true);
                           }}
                           className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-[#967965] hover:text-white transition-colors"
@@ -390,59 +506,125 @@ const CreateProductForm = () => {
                         </button>
                         <button
                           type="button"
-                          onClick={() => removeImage(index)}
+                          onClick={() => removeImage(globalIndex)}
                           className="w-8 h-8 bg-white rounded-full flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors"
                           title="Remover imagem"
                         >
                           <FiX size={14} />
                         </button>
                       </div>
-                      {index > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => moveImage(index, index - 1)}
-                          className="absolute -left-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#967965] rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                          title="Mover para esquerda"
-                        >
-                          ←
-                        </button>
-                      )}
-                      {index < images.length - 1 && (
-                        <button
-                          type="button"
-                          onClick={() => moveImage(index, index + 1)}
-                          className="absolute -right-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-[#967965] rounded-full flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity"
-                          title="Mover para direita"
-                        >
-                          →
-                        </button>
-                      )}
                     </motion.div>
-                  ))}
+                  );
 
-                  {/* Botão para adicionar mais imagens */}
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current.click()}
-                    className="aspect-square border-2 border-dashed border-gray-300 rounded-lg hover:border-[#967965] hover:bg-[#967965]/5 transition-colors flex flex-col items-center justify-center gap-2"
-                  >
-                    <FiPlus size={24} className="text-gray-400" />
-                    <span className="text-xs text-gray-500">Adicionar</span>
-                  </button>
-                </div>
+                  if (isAmbas) {
+                    const goldImages = images.slice(0, imagesGoldCount);
+                    const silverImages = images.slice(imagesGoldCount);
 
-                {/* Input file oculto */}
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  className="hidden"
-                  multiple
-                />
-                <p className="text-xs text-gray-400 mt-2">
-                  Formatos aceitos: JPG, PNG. Tamanho máximo: 5MB por imagem.
-                </p>
+                    return (
+                      <div className="space-y-6">
+                        {/* Seção Dourado */}
+                        <div>
+                          <label className="block text-sm font-medium text-[#967965] mb-2">
+                            Imagens — Dourado * (mínimo 1)
+                          </label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {goldImages.map((img, i) =>
+                              renderImageCard(img, i),
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => goldFileInputRef.current.click()}
+                              className="aspect-square border-2 border-dashed border-gray-300 rounded-lg hover:border-[#967965] hover:bg-[#967965]/5 transition-colors flex flex-col items-center justify-center gap-2 text-center p-3"
+                            >
+                              <FiPlus size={24} className="text-gray-400" />
+                              <span className="text-xs text-gray-500">
+                                Adicionar foto Ouro
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Seção Prata */}
+                        <div>
+                          <label className="block text-sm font-medium text-[#967965] mb-2">
+                            Imagens — Prata * (mínimo 1)
+                          </label>
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {silverImages.map((img, i) =>
+                              renderImageCard(img, imagesGoldCount + i),
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => silverFileInputRef.current.click()}
+                              className="aspect-square border-2 border-dashed border-gray-300 rounded-lg hover:border-[#967965] hover:bg-[#967965]/5 transition-colors flex flex-col items-center justify-center gap-2 text-center p-3"
+                            >
+                              <FiPlus size={24} className="text-gray-400" />
+                              <span className="text-xs text-gray-500">
+                                Adicionar foto Prata
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+
+                        <input
+                          ref={goldFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleGoldImageSelect}
+                          className="hidden"
+                          multiple
+                        />
+                        <input
+                          ref={silverFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleSilverImageSelect}
+                          className="hidden"
+                          multiple
+                        />
+
+                        <p className="text-xs text-gray-400">
+                          A ordem é fixa: 1ª seção = Ouro 18k, 2ª = Prata 925.
+                          Formatos: JPG, PNG.
+                        </p>
+                      </div>
+                    );
+                  }
+
+                  // Material != "Ambas": layout single (igual ao original)
+                  return (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-4">
+                        Imagens do Produto * (mínimo 1)
+                      </label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
+                        {images.map((img, index) => renderImageCard(img, index))}
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current.click()}
+                          className="aspect-square border-2 border-dashed border-gray-300 rounded-lg hover:border-[#967965] hover:bg-[#967965]/5 transition-colors flex flex-col items-center justify-center gap-2"
+                        >
+                          <FiPlus size={24} className="text-gray-400" />
+                          <span className="text-xs text-gray-500">
+                            Adicionar
+                          </span>
+                        </button>
+                      </div>
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageSelect}
+                        className="hidden"
+                        multiple
+                      />
+                      <p className="text-xs text-gray-400 mt-2">
+                        Formatos aceitos: JPG, PNG. Tamanho máximo: 5MB por
+                        imagem.
+                      </p>
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Botão de submit */}

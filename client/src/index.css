@@ -13,6 +13,9 @@
     --font-highlight: "DM Serif Text", serif;
     --font-default: "Inter", sans-serif;
     --font-fancy: "Bodoni Moda", serif;
+
+    /* Breakpoint extra pra mobile pequeno (320-374px) vs mobile médio (375+) */
+    --breakpoint-xs: 375px;
 }
 
 body {
@@ -24,7 +27,6 @@ body {
 }
 
 html {
-    scroll-behavior: smooth;
     max-width: 100vw;
 }
 
@@ -36,6 +38,15 @@ html {
     100% {
         transform: translateX(100%);
     }
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+    animation: marquee 35s linear infinite;
 }
 
 .no-scrollbar {

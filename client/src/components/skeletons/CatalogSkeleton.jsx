@@ -15,12 +15,12 @@ const CatalogSkeleton = ({ count = 8 }) => {
                     lg:grid-cols-3     /* 3 colunas em desktop */
                     xl:grid-cols-4     /* 4 colunas em desktop grande */
                     2xl:grid-cols-4    /* 4 colunas em telas enormes */
-                    gap-6              /* gap maior entre cards */
+                    gap-3              /* gap maior entre cards */
                     sm:gap-8           /* gap ainda maior em telas maiores */
-                    w-screen 
-                    max-w-full 
-                    m-0 
-                    p-6                /* padding maior nas laterais */
+                    w-full
+                    max-w-full
+                    m-0
+                    px-3 py-4          /* padding maior nas laterais */
                     sm:p-8             /* padding ainda maior em telas maiores */
       "
       >

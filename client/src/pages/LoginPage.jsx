@@ -25,6 +25,11 @@ const Header = () => {
   );
 };
 
+const MAX_ATTEMPTS = 3;
+const LOCKOUT_MS = 10 * 60 * 1000; // 10 minutos
+const ATTEMPTS_KEY = "login_attempts";
+const LOCKOUT_KEY = "login_lockout_until";
+
 const LoginPage = () => {
   const navigate = useNavigate();
   const { isAuthenticated, loading } = useAuth();
@@ -33,6 +38,11 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [lockoutUntil, setLockoutUntil] = useState(() => {
+    const v = Number(localStorage.getItem(LOCKOUT_KEY) || 0);
+    return v > Date.now() ? v : 0;
+  });
+  const [remainingMs, setRemainingMs] = useState(() => Math.max(0, lockoutUntil - Date.now()));
 
   useEffect(() => {
     if (!loading && isAuthenticated) {
@@ -40,8 +50,37 @@ const LoginPage = () => {
     }
   }, [isAuthenticated, loading, navigate]);
 
+  // Countdown enquanto bloqueado
+  useEffect(() => {
+    if (!lockoutUntil) return;
+    const tick = () => {
+      const left = lockoutUntil - Date.now();
+      if (left <= 0) {
+        setLockoutUntil(0);
+        setRemainingMs(0);
+        localStorage.removeItem(LOCKOUT_KEY);
+        localStorage.removeItem(ATTEMPTS_KEY);
+      } else {
+        setRemainingMs(left);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [lockoutUntil]);
+
+  const isLocked = lockoutUntil > Date.now();
+
+  const formatRemaining = (ms) => {
+    const totalSec = Math.ceil(ms / 1000);
+    const m = Math.floor(totalSec / 60);
+    const s = totalSec % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isLocked) return;
     setIsSubmitting(true);
     setLoginError(null);
 
@@ -50,16 +89,33 @@ const LoginPage = () => {
 
       if (res.data.success && res.data.data.token) {
         localStorage.setItem("jwtToken", res.data.data.token);
+        localStorage.removeItem(ATTEMPTS_KEY);
+        localStorage.removeItem(LOCKOUT_KEY);
 
         setTimeout(() => {
           navigate("/dashboard");
         }, 500);
       }
     } catch (error) {
-      setLoginError(
-        error.response?.data?.message ||
-          "Erro ao fazer login. Tente novamente.",
-      );
+      const prev = Number(localStorage.getItem(ATTEMPTS_KEY) || 0);
+      const next = prev + 1;
+      if (next >= MAX_ATTEMPTS) {
+        const until = Date.now() + LOCKOUT_MS;
+        localStorage.setItem(LOCKOUT_KEY, String(until));
+        localStorage.removeItem(ATTEMPTS_KEY);
+        setLockoutUntil(until);
+        setRemainingMs(LOCKOUT_MS);
+        setLoginError(
+          `Muitas tentativas inválidas. Tente novamente em 10 minutos.`,
+        );
+      } else {
+        localStorage.setItem(ATTEMPTS_KEY, String(next));
+        const restantes = MAX_ATTEMPTS - next;
+        setLoginError(
+          (error.response?.data?.message || "Credenciais inválidas.") +
+            ` ${restantes} ${restantes === 1 ? "tentativa restante" : "tentativas restantes"}.`,
+        );
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -147,19 +203,21 @@ const LoginPage = () => {
                   {/* Botão de login */}
                   <button
                     type="submit"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || isLocked}
                     className={`
                       w-full py-3.5 px-4 text-sm font-medium
                       flex items-center justify-center gap-2
                       transition-all duration-300 mt-6
                       ${
-                        isSubmitting
+                        isSubmitting || isLocked
                           ? "bg-gray-200 text-gray-500 cursor-not-allowed"
                           : "bg-[#2C2C2C] text-white hover:bg-[#3C3C3C]"
                       }
                     `}
                   >
-                    {isSubmitting ? (
+                    {isLocked ? (
+                      <span>Bloqueado — tente em {formatRemaining(remainingMs)}</span>
+                    ) : isSubmitting ? (
                       <>
                         <div className="w-4 h-4 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
                         <span>Entrando...</span>

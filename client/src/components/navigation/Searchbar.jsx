@@ -3,13 +3,45 @@ import { useState, useRef, useEffect } from "react";
 import { BiSearchAlt2 } from "react-icons/bi";
 import { IoCloseSharp } from "react-icons/io5";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useSearchProducts } from "../../hooks/useSearchProducts";
+
+const CATEGORIES = [
+  { id: "todos", label: "Todos" },
+  { id: "anéis", label: "Anéis" },
+  { id: "body chains", label: "Body Chains" },
+  { id: "braceletes", label: "Braceletes" },
+  { id: "brincos", label: "Brincos" },
+  { id: "chokers", label: "Chokers" },
+  { id: "colares", label: "Colares" },
+  { id: "conjuntos", label: "Conjuntos" },
+  { id: "correntes", label: "Correntes" },
+  { id: "lenços", label: "Lenços" },
+  { id: "piercings", label: "Piercings" },
+  { id: "pulseiras", label: "Pulseiras" },
+  { id: "tornozeleiras", label: "Tornozeleiras" },
+];
 
 const SearchBar = ({ isOpen, onClose }) => {
   const [query, setQuery] = useState("");
   const { results, loading } = useSearchProducts(query);
   const inputRef = useRef(null);
   const searchBarRef = useRef(null);
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeCat = searchParams.get("cat") || "todos";
+
+  const pickCategory = (cat) => {
+    const next = new URLSearchParams(searchParams);
+    if (cat === "todos") next.delete("cat");
+    else next.set("cat", cat);
+    setSearchParams(next, { replace: true });
+    onClose();
+    // Garante que estamos na home (catálogo)
+    if (window.location.pathname !== "/") {
+      navigate({ pathname: "/", search: next.toString() });
+    }
+  };
 
   // Focar no input quando abrir
   useEffect(() => {
@@ -58,6 +90,33 @@ const SearchBar = ({ isOpen, onClose }) => {
     }
   };
 
+  // Ao clicar num resultado: limpa categoria, seta ?q=<nome exato> e vai
+  // pra home. O catálogo filtra pra mostrar essa peça e dá scroll até ela.
+  const handlePickResult = (product) => {
+    const next = new URLSearchParams(searchParams);
+    next.delete("cat");
+    next.set("q", product.name);
+    setSearchParams(next, { replace: true });
+    setQuery("");
+    onClose();
+    if (window.location.pathname !== "/") {
+      navigate({ pathname: "/", search: next.toString() });
+    }
+    // Tenta rolar até a peça em múltiplas tentativas (espera o catálogo re-render)
+    const tryScroll = (attemptsLeft = 8) => {
+      const target =
+        document.getElementById(product.dalia_id) ||
+        document.querySelector("[data-catalog-grid]") ||
+        document.getElementById("nosso-catalogo");
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (attemptsLeft > 0) {
+        setTimeout(() => tryScroll(attemptsLeft - 1), 120);
+      }
+    };
+    setTimeout(() => tryScroll(8), 200);
+  };
+
   const highlightText = (text, highlight) => {
     if (!highlight.trim()) return text;
 
@@ -102,7 +161,23 @@ const SearchBar = ({ isOpen, onClose }) => {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Buscar produtos..."
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      const next = new URLSearchParams(searchParams);
+                      if (query.trim()) next.set("q", query.trim());
+                      else next.delete("q");
+                      setSearchParams(next, { replace: true });
+                      onClose();
+                      if (window.location.pathname !== "/") {
+                        navigate({
+                          pathname: "/",
+                          search: next.toString(),
+                        });
+                      }
+                    }
+                  }}
+                  placeholder="Buscar produtos... (ex: brinco ouro)"
                   className="flex-1 outline-none text-gray-700 placeholder-gray-400 text-base bg-transparent font-light"
                 />
                 {query && (
@@ -117,6 +192,28 @@ const SearchBar = ({ isOpen, onClose }) => {
 
               {/* Linha decorativa sutil */}
               <div className="absolute -bottom-2 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#967965]/30 to-transparent" />
+            </div>
+
+            {/* Atalho por categoria */}
+            <div className="mt-6">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-gray-400 font-fancy mb-3">
+                Filtrar por categoria
+              </p>
+              <div className="flex flex-wrap gap-1.5">
+                {CATEGORIES.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => pickCategory(c.id)}
+                    className={`px-3 py-1.5 text-xs font-fancy rounded-full border transition-all ${
+                      activeCat === c.id
+                        ? "bg-[#967965] text-white border-[#967965]"
+                        : "bg-white text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
+                    }`}
+                  >
+                    {c.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Resultados */}
@@ -161,9 +258,9 @@ const SearchBar = ({ isOpen, onClose }) => {
                           <a
                             onClick={(e) => {
                               e.preventDefault();
-                              handleScrollTo(p.dalia_id);
+                              handlePickResult(p);
                             }}
-                            href={`#${p.dalia_id}`}
+                            href={`/?q=${encodeURIComponent(p.name)}`}
                             className="flex items-center gap-4 px-5 py-4 hover:bg-[#967965]/5 cursor-pointer transition-colors group"
                           >
                             {/* Miniatura do produto com borda sutil */}
