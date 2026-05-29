@@ -280,25 +280,25 @@ const ProductCard = ({ id, product }) => {
           </div>
         )}
 
-        {/* Linha Preço + Botão ADICIONAR — estilo Murano */}
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-[13px] sm:text-base font-default font-normal text-gray-900 leading-none whitespace-nowrap">
+        {/* Linha Preço + Botão ADICIONAR — estilo Murano, compacto */}
+        <div className="flex items-center justify-between gap-1.5 min-w-0">
+          <p className="text-[13px] sm:text-base font-default font-normal text-gray-900 leading-none whitespace-nowrap shrink-0">
             {formattedPrice}
           </p>
           <motion.button
             onClick={handleAddToCart}
             aria-label="Adicionar ao carrinho"
-            className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-[#241F19] hover:bg-black rounded-full text-white"
+            className="inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1 sm:py-1.5 bg-[#241F19] hover:bg-black rounded-full text-white shrink-0"
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <svg
-              width="11"
-              height="11"
+              width="10"
+              height="10"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="sm:w-3.5 sm:h-3.5"
+              className="sm:w-3 sm:h-3"
             >
               <path
                 d="M6 2L3 6V20C3 21.1 3.9 22 5 22H19C20.1 22 21 21.1 21 20V6L18 2H6Z M3 6H21 M16 10C16 12.21 14.21 14 12 14C9.79 14 8 12.21 8 10"
@@ -308,7 +308,7 @@ const ProductCard = ({ id, product }) => {
                 strokeLinejoin="round"
               />
             </svg>
-            <span className="hidden xs:inline text-[9px] sm:text-[11px] font-default font-medium tracking-[0.15em] uppercase">
+            <span className="hidden sm:inline text-[10px] font-default font-medium uppercase">
               Adicionar
             </span>
           </motion.button>
