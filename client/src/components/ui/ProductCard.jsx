@@ -22,6 +22,14 @@ const ProductCard = ({ id, product }) => {
 
   const images = product.images || [product.imageUrl];
   const hasMultipleImages = images.length > 1;
+
+  // Em "Ambas", 1ª foto = Ouro, 2ª = Prata. Ao trocar o material, troca a foto.
+  const handlePickMaterial = (mat) => {
+    setSelectedMaterial(mat);
+    if (!isAmbas) return;
+    if (mat === "Ouro 18k") setCurrentImageIndex(0);
+    else if (mat === "Prata 925" && images.length > 1) setCurrentImageIndex(1);
+  };
   const buttonColor = "#967965";
   const buttonColorDarker = "#6B5847";
 
@@ -312,7 +320,7 @@ const ProductCard = ({ id, product }) => {
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
-                      setSelectedMaterial(mat);
+                      handlePickMaterial(mat);
                     }}
                     className={`px-3 py-1.5 text-xs font-fancy rounded-full border transition-all ${
                       active

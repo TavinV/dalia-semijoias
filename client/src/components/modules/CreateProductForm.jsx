@@ -145,6 +145,15 @@ const CreateProductForm = () => {
       return;
     }
 
+    // Quando material é "Ambas", exige 1 foto Ouro (1ª) + 1 foto Prata (2ª)
+    if (formData.material === "Ambas" && images.length < 2) {
+      setError(
+        "Quando o material é 'Ambas', envie pelo menos 2 fotos — a 1ª da versão Ouro 18k e a 2ª da versão Prata 925",
+      );
+      setLoading(false);
+      return;
+    }
+
     const payload = new FormData();
 
     // Adicionar dados do formulário
@@ -397,9 +406,25 @@ const CreateProductForm = () => {
 
               {/* Seção de Imagens */}
               <div className="border-t border-gray-100 pt-6">
-                <label className="block text-sm font-medium text-gray-700 mb-4">
-                  Imagens do Produto * (mínimo 1)
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Imagens do Produto *{" "}
+                  {formData.material === "Ambas"
+                    ? "(mínimo 2 — 1ª Ouro, 2ª Prata)"
+                    : "(mínimo 1)"}
                 </label>
+
+                {formData.material === "Ambas" && (
+                  <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg flex items-start gap-2 text-xs sm:text-sm text-amber-800">
+                    <span className="text-amber-600 mt-0.5">⚠️</span>
+                    <p>
+                      <strong>Atenção:</strong> Como o material é <strong>"Ambas"</strong>,
+                      a <strong>1ª foto</strong> deve ser do produto em{" "}
+                      <strong>Ouro 18k</strong> e a <strong>2ª foto</strong> em{" "}
+                      <strong>Prata 925</strong> (mesma ordem dos botões que o
+                      cliente vê no catálogo). As demais fotos são opcionais.
+                    </p>
+                  </div>
+                )}
 
                 {/* Grid de uploads */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
@@ -410,10 +435,19 @@ const CreateProductForm = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       className="relative group aspect-square"
                     >
+                      {formData.material === "Ambas" && index < 2 && (
+                        <span className="absolute -top-2 left-1/2 -translate-x-1/2 z-10 px-2 py-0.5 text-[10px] font-fancy uppercase tracking-wider bg-[#967965] text-white rounded-full whitespace-nowrap shadow">
+                          {index === 0 ? "Ouro 18k" : "Prata 925"}
+                        </span>
+                      )}
                       <img
                         src={img.preview}
                         alt={`Produto ${index + 1}`}
-                        className="w-full h-full object-cover rounded-lg border-2 border-gray-200"
+                        className={`w-full h-full object-cover rounded-lg border-2 ${
+                          formData.material === "Ambas" && index < 2
+                            ? "border-[#967965]"
+                            : "border-gray-200"
+                        }`}
                       />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
                         <button
