@@ -55,8 +55,8 @@ const UltimasUnidades = ({ products }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-12 sm:mt-16">
-      <h2 className="font-fancy text-2xl sm:text-3xl text-gray-900 mb-5 sm:mb-6 uppercase tracking-wide">
+    <div className="max-w-7xl mx-auto mt-6 sm:mt-16 px-2 sm:px-0">
+      <h2 className="font-fancy text-lg sm:text-3xl text-gray-900 mb-3 sm:mb-6 uppercase tracking-wide px-2 sm:px-0">
         Últimas Unidades
       </h2>
 
@@ -78,12 +78,12 @@ const UltimasUnidades = ({ products }) => {
 
         <div
           ref={setRef}
-          className="no-scrollbar flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2"
+          className="no-scrollbar flex gap-2 sm:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2"
         >
           {ultimas.map((p) => (
             <div
               key={p._id || p.dalia_id}
-              className="snap-start flex-shrink-0 w-[60%] sm:w-[40%] md:w-[30%] lg:w-[23%]"
+              className="snap-start flex-shrink-0 w-[42%] sm:w-[40%] md:w-[30%] lg:w-[23%]"
             >
               <ProductCard id={p.dalia_id} product={p} />
             </div>

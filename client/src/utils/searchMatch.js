@@ -34,6 +34,7 @@ const SYNONYMS = {
     lencos: ["lenco", "lencos"],
 };
 
+// Remove acentos via Unicode escapes (mais robusto que caracteres literais)
 export const normalize = (s) =>
     (s || "")
         .toString()
