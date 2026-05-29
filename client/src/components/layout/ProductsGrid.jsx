@@ -11,12 +11,12 @@ const ProductsGrid = ({ products, title }) => {
                     grid-cols-2        /* 2 colunas em mobile (igual skeleton) */
                     md:grid-cols-3     /* 3 colunas em tablet */
                     xl:grid-cols-4     /* 4 colunas em desktop grande */
-                    gap-6              /* gap mobile = skeleton */
+                    gap-3              /* gap mobile = skeleton */
                     sm:gap-8           /* gap tablet = skeleton */
-                    w-screen
+                    w-full
                     max-w-full
                     m-0
-                    p-6                /* padding mobile = skeleton */
+                    px-3 py-4          /* padding mobile = skeleton */
                     sm:p-8             /* padding tablet = skeleton */
                 "
       >

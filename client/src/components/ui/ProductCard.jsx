@@ -147,7 +147,7 @@ const ProductCard = ({ id, product }) => {
       onClick={(e) => e.stopPropagation()}
     >
       {/* Container da Imagem — quadrada, fundo branco limpo (estilo Murano) */}
-      <div className="relative aspect-square w-full overflow-hidden bg-white">
+      <div className="relative aspect-square w-full overflow-hidden bg-white rounded-2xl">
         <motion.div
           ref={imageRef}
           className="relative w-full h-full"
@@ -288,13 +288,13 @@ const ProductCard = ({ id, product }) => {
           <motion.button
             onClick={handleAddToCart}
             aria-label="Adicionar ao carrinho"
-            className="inline-flex items-center gap-1.5 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-1.5 bg-[#241F19] hover:bg-black rounded-full text-white shrink-0"
+            className="inline-flex items-center gap-1.5 sm:gap-1.5 px-2.5 sm:px-3 py-2 sm:py-1.5 bg-[#241F19] hover:bg-black rounded-full text-white shrink-0"
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <svg
-              width="12"
-              height="12"
+              width="15"
+              height="15"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
