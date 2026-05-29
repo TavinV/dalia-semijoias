@@ -9,7 +9,6 @@ import {
   FiLogOut,
   FiSettings,
   FiBell,
-  FiSearch,
   FiPlus,
   FiFilter,
   FiDownload,
@@ -598,7 +597,6 @@ const Dashboard = () => {
   const { isAuthenticated, authLoading, logout } = useAuth();
   const { products, loading: productsLoading } = useProducts();
   const { sales, loading: salesLoading } = useAllSales();
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("este mês");
   const [selectedCategory, setSelectedCategory] = useState("todos");
 
@@ -684,32 +682,14 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Barra de Ações e Filtros */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          {/* Busca */}
-          <div className="relative flex-1 max-w-md">
-            <FiSearch
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-              size={18}
-            />
-            <input
-              type="text"
-              placeholder="Buscar produtos..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-lg focus:outline-none focus:border-[#967965] transition-colors text-sm"
-            />
-          </div>
-
-          {/* Ações Rápidas */}
-          <div className="flex flex-wrap items-center gap-3">
-            <QuickAction
-              icon={FiPlus}
-              label="Novo Produto"
-              onClick={() => navigate("/create-product")}
-              color="emerald"
-            />
-          </div>
+        {/* Ações Rápidas */}
+        <div className="flex justify-end mb-6">
+          <QuickAction
+            icon={FiPlus}
+            label="Novo Produto"
+            onClick={() => navigate("/create-product")}
+            color="emerald"
+          />
         </div>
 
         {/* Filtros de Período (agora funcionais — aplicam-se às seções de Vendas e Estoque por Categoria abaixo) */}
@@ -776,7 +756,7 @@ const Dashboard = () => {
               <p className="text-gray-500">Carregando produtos...</p>
             </div>
           ) : (
-            <ProductsTable searchTerm={searchTerm} />
+            <ProductsTable />
           )}
         </div>
 
