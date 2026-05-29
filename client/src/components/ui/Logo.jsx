@@ -1,11 +1,15 @@
 import { NavLink } from "react-router-dom"
 
-const Logo = ( {height = 12}) => {
+const Logo = () => {
   return (
     <NavLink to="/">
-      <img className={`h-${height}`} src="/logo.png" alt="Logo" />
+      <img
+        className="h-8 sm:h-12 w-auto"
+        src="/logo.png"
+        alt="Dália Semijoias"
+      />
     </NavLink>
-  )
-}
+  );
+};
 
-export default Logo
+export default Logo;

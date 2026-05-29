@@ -203,18 +203,18 @@ const ProductCard = ({ id, product }) => {
         {/* Botão Plus */}
         <motion.button
           onClick={handleAddToCart}
-          className="absolute bottom-3 right-3 sm:bottom-6 sm:right-6 w-9 h-9 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-lg z-10"
+          className="absolute bottom-2 right-2 sm:bottom-6 sm:right-6 w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md sm:shadow-lg z-10"
           style={{
             backgroundColor: buttonColor,
-            boxShadow: "0 6px 16px rgba(0,0,0,0.2)",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.18)",
           }}
           whileHover={{ scale: 1.1, backgroundColor: buttonColorDarker }}
           whileTap={{ scale: 0.9 }}
           transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
           <svg
-            width="16"
-            height="16"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -297,18 +297,18 @@ const ProductCard = ({ id, product }) => {
         )}
       </div>
 
-      {/* Informações do produto - CORRIGIDO: altura fixa para alinhamento */}
-      <div className="pt-3 sm:pt-6 pb-3 sm:pb-4 px-1 sm:px-0">
+      {/* Informações do produto */}
+      <div className="pt-2 sm:pt-6 pb-2 sm:pb-4 px-1 sm:px-0">
         {/* Nome do produto - linha única com truncate */}
         <h3
-          className="text-sm sm:text-lg font-fancy font-bold text-gray-900 tracking-wide mb-1 sm:mb-2 truncate"
+          className="text-[13px] sm:text-lg font-fancy font-medium sm:font-bold text-gray-900 tracking-wide mb-0.5 sm:mb-2 truncate leading-snug"
           title={product.name}
         >
           {product.name}
         </h3>
 
-        {/* Descrição - altura fixa de 2-3 linhas com line-clamp */}
-        <div className="h-[2.25rem] sm:h-[2.5rem] mb-2 sm:mb-3">
+        {/* Descrição - escondida no mobile, visível em tablet+ */}
+        <div className="hidden sm:block sm:h-[2.5rem] sm:mb-3">
           <p className="text-xs sm:text-sm text-gray-900 font-fancy leading-snug line-clamp-2 sm:line-clamp-3">
             {description}
           </p>
@@ -316,11 +316,8 @@ const ProductCard = ({ id, product }) => {
 
         {/* Seletor de material (Ambas → escolher Ouro 18k ou Prata 925) */}
         {isAmbas && (
-          <div className="mb-3">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500 font-fancy mb-1.5">
-              Material
-            </p>
-            <div className="flex gap-2">
+          <div className="mb-1.5 sm:mb-3">
+            <div className="flex gap-1 sm:gap-2 flex-wrap">
               {["Ouro 18k", "Prata 925"].map((mat) => {
                 const active = selectedMaterial === mat;
                 return (
@@ -331,13 +328,12 @@ const ProductCard = ({ id, product }) => {
                       e.stopPropagation();
                       handlePickMaterial(mat);
                     }}
-                    className={`px-3 py-1.5 text-xs font-fancy rounded-full border transition-all ${
+                    className={`px-2 py-0.5 sm:px-3 sm:py-1.5 text-[10px] sm:text-xs font-fancy rounded-full border transition-all ${
                       active
                         ? "bg-[#967965] text-white border-[#967965]"
                         : "bg-white text-gray-600 border-gray-300 hover:border-[#967965] hover:text-[#967965]"
                     }`}
                   >
-                    {active && <span className="mr-1">✓</span>}
                     {mat}
                   </button>
                 );
@@ -346,8 +342,8 @@ const ProductCard = ({ id, product }) => {
           </div>
         )}
 
-        {/* Preço - sempre na mesma posição */}
-        <p className="text-base sm:text-lg font-bold font-fancy text-gray-900">
+        {/* Preço */}
+        <p className="text-[15px] sm:text-lg font-bold font-fancy text-gray-900 leading-none">
           R$ {product.price.toFixed(2)}
         </p>
       </div>

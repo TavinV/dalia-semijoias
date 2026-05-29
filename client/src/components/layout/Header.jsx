@@ -14,17 +14,16 @@ const NavItens = ({ onCartClick, onSearchClick, isScrolled }) => {
   const { cart } = useCart();
 
   return (
-    <div className="flex items-center gap-4 sm:gap-6">
+    <div className="flex items-center gap-2 sm:gap-6">
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
-        className="relative p-2 rounded-full hover:bg-[#967965]/10 transition-colors"
+        className="relative p-1.5 sm:p-2 rounded-full hover:bg-[#967965]/10 transition-colors"
         onClick={onSearchClick}
       >
         <IoSearchSharp
-          size={20}
-          className={`transition-colors ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
+          className={`w-[18px] h-[18px] sm:w-5 sm:h-5 transition-colors ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
         />
       </motion.button>
 
@@ -32,7 +31,7 @@ const NavItens = ({ onCartClick, onSearchClick, isScrolled }) => {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
-        className="relative p-2 rounded-full hover:bg-[#967965]/10 transition-colors"
+        className="relative p-1.5 sm:p-2 rounded-full hover:bg-[#967965]/10 transition-colors"
         onClick={onCartClick}
       >
         <div className="relative">
@@ -42,15 +41,14 @@ const NavItens = ({ onCartClick, onSearchClick, isScrolled }) => {
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 exit={{ scale: 0 }}
-                className="absolute -top-3 -right-3 bg-[#967965] text-white text-xs font-medium rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1 shadow-md"
+                className="absolute -top-2 -right-2 sm:-top-3 sm:-right-3 bg-[#967965] text-white text-[10px] sm:text-xs font-medium rounded-full min-w-[16px] h-[16px] sm:min-w-[18px] sm:h-[18px] flex items-center justify-center px-1 shadow-md"
               >
                 {cart.length > 9 ? "9+" : cart.length}
               </motion.span>
             )}
           </AnimatePresence>
           <LuShoppingCart
-            size={20}
-            className={`transition-colors ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
+            className={`w-[18px] h-[18px] sm:w-5 sm:h-5 transition-colors ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
           />
         </div>
       </motion.button>
@@ -104,14 +102,14 @@ const Header = () => {
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         className={`
-          w-full sticky top-0 h-20 px-6 sm:px-10 md:px-15 
-          flex items-center justify-between 
-          mb-10
+          w-full sticky top-0 h-14 sm:h-20 px-4 sm:px-10 md:px-15
+          flex items-center justify-between
+          mb-2 sm:mb-10
           transition-all duration-300 z-50
           ${
             isScrolled
-              ? "bg-white/90 backdrop-blur-md shadow-lg"
-              : "bg-white/80 backdrop-blur-sm shadow-md"
+              ? "bg-white/95 backdrop-blur-md shadow-md"
+              : "bg-white/90 backdrop-blur-sm shadow-sm sm:shadow-md"
           }
         `}
       >
