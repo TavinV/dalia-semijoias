@@ -21,6 +21,79 @@ const formatBRL = (v) =>
     currency: "BRL",
   });
 
+// Carrossel horizontal das peças com 1 unidade em estoque
+const UltimasUnidades = ({ products }) => {
+  const carouselRef = useState(null);
+  const scrollRef = { current: null };
+
+  const setRef = (el) => {
+    scrollRef.current = el;
+  };
+
+  const ultimas = (products || []).filter(
+    (p) => Math.max(0, Number(p.stock) || 0) === 1,
+  );
+
+  if (ultimas.length === 0) return null;
+
+  const scrollLeft = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({
+        left: -scrollRef.current.offsetWidth / 2,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({
+        left: scrollRef.current.offsetWidth / 2,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto mt-12 sm:mt-16">
+      <h2 className="font-fancy text-2xl sm:text-3xl text-gray-900 mb-5 sm:mb-6 uppercase tracking-wide">
+        Últimas Unidades
+      </h2>
+
+      <div className="relative">
+        <button
+          onClick={scrollLeft}
+          className="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow items-center justify-center text-gray-500 hover:text-[#967965] hover:border-[#967965] transition-colors"
+          aria-label="Anterior"
+        >
+          ←
+        </button>
+        <button
+          onClick={scrollRight}
+          className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full bg-white border border-gray-200 shadow items-center justify-center text-gray-500 hover:text-[#967965] hover:border-[#967965] transition-colors"
+          aria-label="Próxima"
+        >
+          →
+        </button>
+
+        <div
+          ref={setRef}
+          className="no-scrollbar flex gap-4 sm:gap-6 overflow-x-auto snap-x snap-mandatory scroll-smooth pb-2"
+        >
+          {ultimas.map((p) => (
+            <div
+              key={p._id || p.dalia_id}
+              className="snap-start flex-shrink-0 w-[60%] sm:w-[40%] md:w-[30%] lg:w-[23%]"
+            >
+              <ProductCard id={p.dalia_id} product={p} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Top 5 peças mais vendidas no mês (público)
 const TopMesPublico = ({ products }) => {
   const [topItems, setTopItems] = useState([]);
@@ -607,6 +680,9 @@ function Catalog() {
           ) : sortedProducts.length > 0 ? (
             <>
               <ProductsGrid products={paginatedProducts} />
+
+              {/* Últimas Unidades — peças com 1 só em estoque */}
+              <UltimasUnidades products={products} />
 
               {/* Paginação */}
               {totalPages > 1 && (
