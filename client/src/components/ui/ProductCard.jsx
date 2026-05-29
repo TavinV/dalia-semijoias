@@ -288,17 +288,17 @@ const ProductCard = ({ id, product }) => {
           <motion.button
             onClick={handleAddToCart}
             aria-label="Adicionar ao carrinho"
-            className="inline-flex items-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-1 sm:py-1.5 bg-[#241F19] hover:bg-black rounded-full text-white shrink-0"
+            className="inline-flex items-center gap-1.5 sm:gap-1.5 px-2 sm:px-3 py-1.5 sm:py-1.5 bg-[#241F19] hover:bg-black rounded-full text-white shrink-0"
             whileTap={{ scale: 0.95 }}
             transition={{ type: "spring", stiffness: 400, damping: 17 }}
           >
             <svg
-              width="10"
-              height="10"
+              width="12"
+              height="12"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
-              className="sm:w-3 sm:h-3"
+              className="sm:w-3.5 sm:h-3.5"
             >
               <path
                 d="M6 2L3 6V20C3 21.1 3.9 22 5 22H19C20.1 22 21 21.1 21 20V6L18 2H6Z M3 6H21 M16 10C16 12.21 14.21 14 12 14C9.79 14 8 12.21 8 10"

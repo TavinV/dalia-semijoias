@@ -4,7 +4,7 @@ const Logo = () => {
   return (
     <NavLink to="/">
       <img
-        className="h-8 sm:h-12 w-auto"
+        className="h-10 sm:h-12 w-auto"
         src="/logo.png"
         alt="Dália Semijoias"
       />

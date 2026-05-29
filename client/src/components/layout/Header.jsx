@@ -23,7 +23,7 @@ const NavItens = ({ onCartClick, onSearchClick, isScrolled }) => {
         onClick={onSearchClick}
       >
         <IoSearchSharp
-          className={`w-[18px] h-[18px] sm:w-5 sm:h-5 transition-colors ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
+          className={`w-[22px] h-[22px] sm:w-5 sm:h-5 transition-colors ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
         />
       </motion.button>
 
@@ -48,7 +48,7 @@ const NavItens = ({ onCartClick, onSearchClick, isScrolled }) => {
             )}
           </AnimatePresence>
           <LuShoppingCart
-            className={`w-[18px] h-[18px] sm:w-5 sm:h-5 transition-colors ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
+            className={`w-[22px] h-[22px] sm:w-5 sm:h-5 transition-colors ${isScrolled ? "text-gray-700" : "text-gray-800"}`}
           />
         </div>
       </motion.button>
