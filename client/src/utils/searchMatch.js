@@ -47,6 +47,21 @@ export const normalize = (s) =>
         .replace(/[̀-ͯ]/g, "")
         .trim();
 
+// Detecta intenção de "últimas unidades" — variações: ultima/ultimas/unidade/unidades
+// Também aceita "ultima peca", "ultimas pecas", "ultima unidade"
+export const isUltimasUnidadesQuery = (query) => {
+    if (!query) return false;
+    const q = normalize(query);
+    if (!q) return false;
+    // qualquer combinação que inclua "ultima(s)" + ("unidade(s)" OU "peca(s)")
+    const hasUltimas = /\bultima(s)?\b/.test(q);
+    const hasUnidades = /\bunidade(s)?\b/.test(q) || /\bpeca(s)?\b/.test(q);
+    if (hasUltimas && hasUnidades) return true;
+    // formas curtas e diretas
+    if (q === "ultima" || q === "ultimas" || q === "ultimas unidades" || q === "ultima unidade") return true;
+    return false;
+};
+
 export const matchesQuery = (product, query) => {
     if (!query) return true;
     const terms = normalize(query).split(/\s+/).filter(Boolean);

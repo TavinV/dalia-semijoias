@@ -13,7 +13,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import SkeletonCard from "../components/skeletons/SkeletonCard.jsx";
 import ProductCard from "../components/ui/ProductCard.jsx";
 import api from "../api/axios.js";
-import { matchesQuery } from "../utils/searchMatch.js";
+import { matchesQuery, isUltimasUnidadesQuery } from "../utils/searchMatch.js";
 
 const formatBRL = (v) =>
   (Number(v) || 0).toLocaleString("pt-BR", {
@@ -284,10 +284,14 @@ function Catalog() {
   };
 
   // Filtra produtos por TODOS os filtros ativos (multi-select em material e gênero)
+  const ultimasUnidadesSearch = isUltimasUnidadesQuery(searchQuery);
   const filteredProducts = useMemo(() => {
     if (!products) return [];
     return products.filter((p) => {
-      if ((Number(p.stock) || 0) < 1) return false;
+      const stock = Number(p.stock) || 0;
+      if (stock < 1) return false;
+      // Busca por "últimas unidades" → só peças com estoque exatamente 1
+      if (ultimasUnidadesSearch && stock !== 1) return false;
       if (selectedCategory !== "todos") {
         if (norm(p.category) !== norm(selectedCategory)) return false;
       }
@@ -298,7 +302,8 @@ function Catalog() {
         if (!selectedGenders.includes(norm(p.gender))) return false;
       }
       if (maxPrice !== null && Number(p.price) > maxPrice) return false;
-      if (searchQuery && !matchesQuery(p, searchQuery)) return false;
+      // Só aplica o match textual normal se NÃO for busca de últimas unidades
+      if (!ultimasUnidadesSearch && searchQuery && !matchesQuery(p, searchQuery)) return false;
       return true;
     });
   }, [
@@ -308,6 +313,7 @@ function Catalog() {
     selectedGenders,
     maxPrice,
     searchQuery,
+    ultimasUnidadesSearch,
   ]);
 
   // Ordenação
