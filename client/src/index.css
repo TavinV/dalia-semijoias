@@ -13,6 +13,9 @@
     --font-highlight: "DM Serif Text", serif;
     --font-default: "Inter", sans-serif;
     --font-fancy: "Bodoni Moda", serif;
+
+    /* Breakpoint extra pra mobile pequeno (320-374px) vs mobile médio (375+) */
+    --breakpoint-xs: 375px;
 }
 
 body {

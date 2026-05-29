@@ -200,10 +200,11 @@ const ProductCard = ({ id, product }) => {
           </AnimatePresence>
         </motion.div>
 
-        {/* Botão Plus */}
+        {/* Botão Plus — área de toque mínima 48x48 (com padding externo) */}
         <motion.button
           onClick={handleAddToCart}
-          className="absolute bottom-2 right-2 sm:bottom-6 sm:right-6 w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md sm:shadow-lg z-10"
+          aria-label="Adicionar ao carrinho"
+          className="absolute bottom-2 right-2 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-12 sm:h-12 rounded-full flex items-center justify-center shadow-md sm:shadow-lg z-10"
           style={{
             backgroundColor: buttonColor,
             boxShadow: "0 4px 12px rgba(0,0,0,0.18)",
@@ -298,10 +299,10 @@ const ProductCard = ({ id, product }) => {
       </div>
 
       {/* Informações do produto */}
-      <div className="pt-1.5 sm:pt-6 pb-1.5 sm:pb-4 px-1 sm:px-0">
+      <div className="pt-2 sm:pt-6 pb-2 sm:pb-4 px-2 sm:px-0">
         {/* Nome do produto - linha única com truncate */}
         <h3
-          className="text-[12px] sm:text-lg font-fancy font-medium sm:font-bold text-gray-900 tracking-wide mb-0.5 sm:mb-2 truncate leading-snug"
+          className="text-sm sm:text-lg font-fancy font-medium sm:font-bold text-gray-900 tracking-wide mb-1 sm:mb-2 truncate leading-snug"
           title={product.name}
         >
           {product.name}
@@ -342,8 +343,8 @@ const ProductCard = ({ id, product }) => {
           </div>
         )}
 
-        {/* Preço */}
-        <p className="text-[13px] sm:text-lg font-bold font-fancy text-gray-900 leading-none">
+        {/* Preço — valor financeiro principal, mínimo 16px */}
+        <p className="text-base sm:text-lg font-bold font-fancy text-gray-900 leading-none">
           R$ {product.price.toFixed(2)}
         </p>
       </div>
