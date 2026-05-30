@@ -224,7 +224,9 @@ const CreateProductForm = () => {
     const payload = new FormData();
 
     // Adicionar dados do formulário
+    // Compat.: o servidor antigo (Render) ainda não conhece "isBrasil" — só envia quando marcado
     Object.entries(formData).forEach(([key, value]) => {
+      if (key === "isBrasil" && !value) return;
       payload.append(key, value);
     });
 
