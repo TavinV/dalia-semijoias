@@ -715,21 +715,6 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Filtro por categoria */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#967965] bg-white"
-          >
-            <option value="todos">Todas categorias</option>
-            {Array.from(
-              new Set((products || []).map((p) => p.category).filter(Boolean)),
-            ).map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Tabela de Produtos */}

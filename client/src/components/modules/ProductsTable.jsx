@@ -197,6 +197,22 @@ const ProductsTable = () => {
             )}
           </div>
 
+          {/* Filtro por categoria */}
+          <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0">
+            <FiFilter className="text-gray-400" size={18} />
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#967965] bg-white"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat === "todos" ? "Todas categorias" : cat}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Contador de resultados */}
           <div className="text-sm text-gray-500">
             {filteredProducts.length}{" "}
