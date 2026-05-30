@@ -14,11 +14,15 @@ class SaleServices {
             const { error } = saleSchema.validate(data);
             if (error) throw new ValidationError(error.details[0].message);
 
-            const client = await Client.findById(data.clientId);
-            if (!client) throw new NotFoundError("Cliente não encontrado");
+            // Cliente é opcional: vendas avulsas (sem dados da pessoa) não têm clientId.
+            if (data.clientId) {
+                const client = await Client.findById(data.clientId);
+                if (!client) throw new NotFoundError("Cliente não encontrado");
+            }
 
             const sale = new Sale({
                 ...data,
+                clientId: data.clientId || null,
                 paidAt: data.paid ? new Date() : null,
             });
             return await sale.save();

@@ -19,10 +19,7 @@ const saleItemSchema = Joi.object({
 });
 
 const saleSchema = Joi.object({
-    clientId: Joi.string().required().messages({
-        "any.required": "O cliente é obrigatório",
-        "string.empty": "O cliente é obrigatório",
-    }),
+    clientId: Joi.string().allow(null, "").optional(),
     items: Joi.array().items(saleItemSchema).min(1).required().messages({
         "array.min": "Adicione ao menos um item à venda",
         "any.required": "Itens são obrigatórios",

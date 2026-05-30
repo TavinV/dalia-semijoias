@@ -104,7 +104,7 @@ const Header = () => {
         className={`
           w-full sticky top-0 h-14 sm:h-20 px-4 sm:px-10 md:px-15
           flex items-center justify-between
-          mb-2 sm:mb-10
+          mb-2 sm:mb-6
           transition-all duration-300 z-50
           ${
             isScrolled

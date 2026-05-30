@@ -230,7 +230,7 @@ const CreateSaleModal = ({ clientId, clientName, isOpen, onClose, onSuccess }) =
 
     try {
       const payload = {
-        clientId,
+        clientId: clientId || null,
         items: items.map((it) => ({
           productId: it.productId || null,
           name: it.name.trim(),

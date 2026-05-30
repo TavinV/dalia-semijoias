@@ -12,7 +12,7 @@ const saleItemSchema = new mongoose.Schema(
 
 const saleSchema = new mongoose.Schema(
     {
-        clientId: { type: mongoose.Schema.Types.ObjectId, ref: "Client", required: true },
+        clientId: { type: mongoose.Schema.Types.ObjectId, ref: "Client", default: null },
         items: { type: [saleItemSchema], required: true, validate: v => v.length > 0 },
         total: { type: Number, required: true, min: 0 },
         paid: { type: Boolean, default: false },

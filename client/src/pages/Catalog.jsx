@@ -86,7 +86,7 @@ const UltimasUnidades = ({ products }) => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-4 sm:mt-16 px-2 sm:px-0">
+    <div className="max-w-7xl mx-auto mt-6 sm:mt-10 px-2 sm:px-0">
       <h2 className="font-fancy text-base sm:text-3xl text-gray-900 mb-2 sm:mb-6 uppercase tracking-wide px-2 sm:px-0">
         Últimas Unidades
       </h2>
@@ -200,7 +200,7 @@ const ColecaoHexa = ({ products }) => {
   );
 };
 
-// Top 5 peças mais vendidas no mês (público)
+// Top 4 peças mais vendidas no mês (público)
 const TopMesPublico = ({ products }) => {
   const [topItems, setTopItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -208,7 +208,7 @@ const TopMesPublico = ({ products }) => {
   useEffect(() => {
     let cancelled = false;
     api
-      .get("/sales/top-mes", { params: { limit: 5 } })
+      .get("/sales/top-mes", { params: { limit: 4 } })
       .then((r) => {
         if (!cancelled) setTopItems(r.data.data || []);
       })
@@ -508,7 +508,7 @@ function Catalog() {
         {/* Cabeçalho do catálogo */}
         <div
           id="nosso-catalogo"
-          className="w-full max-w-screen mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-12 scroll-mt-16"
+          className="w-full max-w-screen mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-7 scroll-mt-16"
         >
           <div className="text-center space-y-1 sm:space-y-3">
             <h1 className="font-fancy text-xl sm:text-4xl md:text-5xl text-gray-900 tracking-tight">
@@ -520,7 +520,7 @@ function Catalog() {
           </div>
 
           {/* Toolbar: botão Categorias + Filtros + ordenação */}
-          <div className="mt-4 sm:mt-12 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 max-w-5xl mx-auto">
+          <div className="mt-4 sm:mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 max-w-5xl mx-auto">
             <div className="flex items-center gap-2 flex-1 sm:flex-initial">
               <button
                 onClick={() => {

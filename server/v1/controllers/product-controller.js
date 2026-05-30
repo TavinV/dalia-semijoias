@@ -57,16 +57,19 @@ const productController = {
             const { id } = req.params;
             let produto;
 
-            // Leitura do array de imagens do corpo da requisição (caso seja enviado como JSON)
-            if (req.files && req.files.length > 0) {
-                const images = req.files.map((file) => file.path); // URLs do Cloudinary
-                produto = await ProductServices.updateProduct(id, {
-                    ...req.body,
-                    images,
-                });
-            } else {
-                produto = await ProductServices.updateProduct(id, req.body);
-            }
+            // Junta as imagens já existentes (URLs enviadas como texto) com as novas
+            // (arquivos enviados no upload). Normaliza pra sempre ser uma lista,
+            // mesmo quando há só 1 imagem (que chegaria como texto solto).
+            const existentes = req.body.images
+                ? (Array.isArray(req.body.images) ? req.body.images : [req.body.images])
+                : [];
+            const novas = (req.files || []).map((file) => file.path); // URLs do Cloudinary
+            const images = [...existentes, ...novas];
+
+            produto = await ProductServices.updateProduct(id, {
+                ...req.body,
+                images,
+            });
 
             return ApiResponse.OK(res, produto, "Produto atualizado com sucesso");
         } catch (error) {
