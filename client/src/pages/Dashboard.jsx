@@ -185,7 +185,7 @@ const VendasSection = ({ sales, products, loading, period, category }) => {
     0,
   );
 
-  // Top 5 peças mais vendidas NO MÊS (sempre do mês atual, independente do período)
+  // Top 4 peças mais vendidas NO MÊS (sempre do mês atual, independente do período)
   const topMes = useMemo(() => {
     const agg = {};
     for (const s of sales || []) {
@@ -202,7 +202,7 @@ const VendasSection = ({ sales, products, loading, period, category }) => {
     }
     return Object.values(agg)
       .sort((a, b) => b.qty - a.qty)
-      .slice(0, 5);
+      .slice(0, 4);
   }, [sales]);
 
   // Histórico (mais recentes primeiro)
@@ -263,12 +263,12 @@ const VendasSection = ({ sales, products, loading, period, category }) => {
         </div>
       </div>
 
-      {/* Top 5 peças do mês */}
+      {/* Top 4 peças do mês */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 mb-6">
         <div className="flex items-center gap-2 mb-3">
           <FiAward className="text-[#967965]" />
           <h3 className="font-fancy text-lg text-gray-900">
-            Top 5 peças mais vendidas no mês
+            Top 4 peças mais vendidas no mês
           </h3>
         </div>
         {loading ? (
@@ -715,21 +715,6 @@ const Dashboard = () => {
             )}
           </div>
 
-          {/* Filtro por categoria */}
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#967965] bg-white"
-          >
-            <option value="todos">Todas categorias</option>
-            {Array.from(
-              new Set((products || []).map((p) => p.category).filter(Boolean)),
-            ).map((cat) => (
-              <option key={cat} value={cat}>
-                {cat}
-              </option>
-            ))}
-          </select>
         </div>
 
         {/* Tabela de Produtos */}

@@ -18,6 +18,7 @@ import Fornecedores from './pages/Fornecedores.jsx';
 import FornecedorDetail from './pages/FornecedorDetail.jsx';
 import Saidas from './pages/Saidas.jsx';
 import Relatorios from './pages/Relatorios.jsx';
+import Vendas from './pages/Vendas.jsx';
 
 const wrap = (el) => <PageWrapper>{el}</PageWrapper>;
 
@@ -30,6 +31,7 @@ const router = createBrowserRouter([
   { path: '/clients', element: wrap(<Clients />) },
   { path: '/clients/:id', element: wrap(<ClientDetail />) },
   { path: '/pendencies', element: wrap(<Pendencies />) },
+  { path: '/admin/vendas', element: wrap(<Vendas />) },
   { path: '/admin/fornecedores', element: wrap(<Fornecedores />) },
   { path: '/admin/fornecedores/:id', element: wrap(<FornecedorDetail />) },
   { path: '/admin/saidas', element: wrap(<Saidas />) },

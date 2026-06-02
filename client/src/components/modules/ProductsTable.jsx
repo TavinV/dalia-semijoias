@@ -303,9 +303,9 @@ const ProductsTable = () => {
                         className="hover:bg-gray-50 transition-colors"
                       >
                         <td className="py-3 px-4">
-                          {product.imageUrl ? (
+                          {(product.images?.[0] || product.imageUrl) ? (
                             <img
-                              src={product.imageUrl}
+                              src={product.images?.[0] || product.imageUrl}
                               alt={product.name}
                               className="w-12 h-12 object-cover rounded-lg border border-gray-200"
                             />

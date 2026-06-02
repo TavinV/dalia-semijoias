@@ -148,6 +148,12 @@ const ProductCard = ({ id, product }) => {
     >
       {/* Container da Imagem — quadrada, fundo branco limpo (estilo Murano) */}
       <div className="relative aspect-square w-full overflow-hidden bg-white rounded-2xl">
+        {/* Etiqueta "LANÇAMENTO" — só nos produtos da Coleção Hexa */}
+        {product.isBrasil && (
+          <span className="absolute top-2 left-2 z-20 px-2.5 py-1 rounded-full bg-[#0B9444] text-white text-[9px] sm:text-[10px] font-default font-semibold uppercase tracking-wider shadow">
+            Lançamento
+          </span>
+        )}
         <motion.div
           ref={imageRef}
           className="relative w-full h-full"

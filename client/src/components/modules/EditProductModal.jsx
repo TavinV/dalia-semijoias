@@ -25,6 +25,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
     material: "",
     gender: "",
     stock: "",
+    isBrasil: false,
   });
 
   // Estado para múltiplas imagens
@@ -71,6 +72,7 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
         material: product.material || "",
         gender: product.gender || "",
         stock: product.stock || "",
+        isBrasil: product.isBrasil || false,
       });
 
       // Carregar imagens existentes
@@ -87,8 +89,11 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
   }, [product]);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const onCropComplete = useCallback((_, croppedAreaPixels) => {
@@ -197,7 +202,9 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
     const payload = new FormData();
 
     // Adicionar dados do formulário
+    // Compat.: o servidor antigo (Render) ainda não conhece "isBrasil" — só envia quando marcado
     Object.entries(formData).forEach(([key, value]) => {
+      if (key === "isBrasil" && !value) return;
       payload.append(key, value);
     });
 
@@ -454,6 +461,32 @@ const EditProductModal = ({ product, isOpen, onClose, onSave }) => {
                       />
                     </div>
                   </div>
+
+                  {/* Coleção Hexa (Copa do Mundo) */}
+                  <label
+                    className={`flex items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-colors ${
+                      formData.isBrasil
+                        ? "border-[#009c3b] bg-[#009c3b]/5"
+                        : "border-gray-200 hover:border-[#009c3b]/50"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      name="isBrasil"
+                      checked={formData.isBrasil}
+                      onChange={handleChange}
+                      className="w-5 h-5 accent-[#009c3b]"
+                    />
+                    <div>
+                      <span className="block text-sm font-medium text-gray-800">
+                        ⚽ Coleção Hexa
+                      </span>
+                      <span className="block text-xs text-gray-500">
+                        Destaca a peça na seção da Copa, no topo do site. Ela
+                        continua na categoria normal dela.
+                      </span>
+                    </div>
+                  </label>
 
                   {/* Seção de Imagens */}
                   <div className="border-t border-gray-100 pt-6">

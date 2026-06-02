@@ -82,6 +82,7 @@ const updateProductSchema = Joi.object({
             }),
 
     gender: Joi.string(),
+    isBrasil: Joi.boolean(),
     image: Joi.string()
 })
     .min(1)
